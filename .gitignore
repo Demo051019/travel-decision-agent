@@ -10,7 +10,10 @@ dist/
 .edgeone.zip
 
 # Environment variables
+# Ignore every real env file, keep the placeholder template tracked.
 .env
+.env.*
+!.env.example
 agents-python/.env
 agents-python/chat/.env
 
@@ -39,3 +42,7 @@ plan/
 # AI assistant local instructions
 CLAUDE.md
 AGENTS.md
+
+# Tencent Cloud EdgeOne
+.edgeone/*
+.tef_dist/*

@@ -1,26 +1,26 @@
 const en = {
   // Header
-  "app.title": "OpenAI Agents Starter",
-  "app.subtitle": "Running on EdgeOne Makers with session memory & Agent Tools",
+  "app.title": "Trip Decision Assistant",
+  "app.subtitle": "Running on EdgeOne Makers — helps you pick the right mall nearby",
 
   // Empty state
-  "empty.title": "OpenAI Agents Starter",
-  "empty.hint": "I'm an OpenAI Agent running on EdgeOne with custom tools and session memory. I can help with weather, clothing advice, translation, and text statistics.",
-  "empty.features": "EdgeOne Store · Session Memory · Agent Tools",
+  "empty.title": "Trip Decision Assistant",
+  "empty.hint": "Tell me where you are and which brand you're after. I'll search nearby malls, check store availability, compare distances, and give you a grounded recommendation.",
+  "empty.features": "Amap · Brand check · Session memory",
 
   // Chat input
-  "chat.placeholder": "Type a message...  ⏎ Send · Shift+⏎ Newline",
-  "chat.hint": "Powered by OpenAI Agents SDK + EdgeOne Makers · Demo only",
+  "chat.placeholder": "Where are you, and what do you want to shop for?  ⏎ Send · Shift+⏎ Newline",
+  "chat.hint": "Powered by OpenAI Agents SDK + EdgeOne Makers · Distances and stores from Amap",
 
   // Preset questions
-  "preset.1": "What is the weather like in Beijing now? Any clothing suggestions?",
-  "preset.2": "Translate \"Hello, welcome to Beijing!\" into Chinese and count the characters.",
+  "preset.1": "I'm at Shenzhen North Station — which malls are within 3 km?",
+  "preset.2": "I want to buy from Uniqlo. Which nearby mall has one, and which is closest?",
 
   // Tool indicators
-  "tool.weather": "Weather",
-  "tool.clothing": "Clothing",
-  "tool.translate": "Translate",
-  "tool.statistics": "Statistics",
+  "tool.locate": "Geocode",
+  "tool.malls": "Find malls",
+  "tool.brand": "Check brand",
+  "tool.rank": "Rank & pick",
 
   // Status & errors
   "status.error": "Request failed. Please check if the backend service is running.",

@@ -1,8 +1,8 @@
-# OpenAI Agents Starter (Python)
+# Travel Decision Agent
 
-A full-stack EdgeOne Makers Agent template — streaming chat backed by the OpenAI Agents SDK (Python), with custom tools and `context.store`-backed conversation memory.
+A full-stack EdgeOne Makers Agent: streaming chat backed by the OpenAI Agents SDK (Python) that finds malls near you, checks brand availability, compares distances, and explains its recommendation.
 
-**Framework:** OpenAI Agents SDK · **Category:** Quick Start <!-- TODO: confirm --> · **Language:** Python
+**Framework:** OpenAI Agents SDK · **Category:** Agent · **Language:** Python
 
 [![Deploy to EdgeOne Makers](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/makers/new?template=openai-agents-starter-python&from=within&fromAgent=1&agentLang=python)
 
@@ -25,6 +25,7 @@ A minimal, production-shaped Python starter that wires the OpenAI Agents SDK int
 | `AI_GATEWAY_API_KEY` | Yes | Model gateway API key. Use your Makers Models API Key, or any OpenAI-compatible provider key. |
 | `AI_GATEWAY_BASE_URL` | Yes | Gateway base URL. For Makers Models, use `https://ai-gateway.edgeone.link/v1`. |
 | `AI_GATEWAY_MODEL` | No | Model ID. Defaults to `@makers/deepseek-v4-flash` (a free built-in model). |
+| `AMAP_API_KEY` | Yes | Amap (高德) Web Service key for geocoding, POI search, and walking routes. Legacy name `AMAP_KEY` is also accepted. |
 
 This template follows the OpenAI-compatible standard — point these at Makers Models or any compatible provider.
 

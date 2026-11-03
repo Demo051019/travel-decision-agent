@@ -58,20 +58,20 @@ export default function CodeViewer() {
           <L n={4}><Cmt t="# 1. Define tools with @function_tool" /></L>
           <L n={5}><Dec t="@function_tool" /></L>
           <L n={6}>
-            <Kw t="def " /><Fn t="get_weather" /><Op t="(" />
-            <Va t="city" /><Op t=": " /><Ty t="Annotated" /><Op t="[" />
-            <Ty t="str" /><Op t=", " /><Str t='"The city to get weather for"' />
+            <Kw t="async def " /><Fn t="resolve_location" /><Op t="(" />
+            <Va t="address" /><Op t=": " /><Ty t="Annotated" /><Op t="[" />
+            <Ty t="str" /><Op t=", " /><Str t='"用户说的地点"' />
             <Op t="]) -> " /><Ty t="str" /><Op t=":" />
           </L>
           <L n={7}>
-            <I1><Doc t='"""Get the current weather for a specified city."""' /></I1>
+            <I1><Doc t='"""地点 → 经纬度；有歧义时返回 need_clarification 追问。"""' /></I1>
           </L>
           <L n={8}>
-            <I1><Cmt t="# ..." /></I1>
+            <I1><Cmt t="# 调高德 geocode，Key 只从环境变量读取" /></I1>
           </L>
           <L n={9} />
           <L n={10}>
-            <Va t="TOOLS" /><Op t=" = [" /><Fn t="get_weather" /><Op t=", " /><Cmt t="# More tools..." /><Op t="]" />
+            <Va t="TOOLS" /><Op t=" = [" /><Fn t="resolve_location" /><Op t=", " /><Fn t="search_nearby_malls" /><Op t=", ...]" />
           </L>
           <L n={11} />
 

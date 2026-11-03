@@ -24,7 +24,13 @@ from openai.types.responses import ResponseTextDeltaEvent
 from agents import Agent, OpenAIChatCompletionsModel, Runner
 
 from .._logger import create_logger
-from .._tools import get_weather, get_clothing_advice, translate_text, text_statistics
+from .._prompts import GREETING_HINT, INSTRUCTIONS
+from .._tools import (
+    check_brands_in_malls,
+    rank_and_recommend,
+    resolve_location,
+    search_nearby_malls,
+)
 
 
 load_dotenv()
@@ -46,13 +52,14 @@ llm_model = OpenAIChatCompletionsModel(
 
 # ========== Agent ==========
 agent = Agent(
-    name="Assistant",
-    instructions=(
-        "You are an EdgeOne Makers OpenAI Agents SDK (Python) starter example: an out-of-the-box Agent template that helps developers quickly run through and validate platform capabilities.\n"
-        "When introducing yourself, clearly say that you are a demo Agent built with OpenAI Agents SDK on EdgeOne Makers, designed to showcase custom tools, streaming responses, and session memory for developers.\n"
-        "Use the four custom tools when they help you answer the user concretely. Otherwise answer directly and keep the response brief."
-    ),
-    tools=[get_weather, get_clothing_advice, translate_text, text_statistics],
+    name="出行决策助手",
+    instructions=INSTRUCTIONS + "\n\n## 首次打招呼\n" + GREETING_HINT,
+    tools=[
+        resolve_location,
+        search_nearby_malls,
+        check_brands_in_malls,
+        rank_and_recommend,
+    ],
     model=llm_model,
 )
 
