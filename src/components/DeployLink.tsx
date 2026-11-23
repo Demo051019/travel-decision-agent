@@ -1,29 +1,19 @@
 import { useState } from 'react';
 import { useT } from '../i18n';
 
-const TEMPLATE = 'openai-agents-starter-python';
-const AGENT_LANG = 'python';
-
 /**
- * Build the one-click deploy URL.
- *
- * On *.edgeone.dev (the public preview surface) we point to edgeone.ai;
- * everywhere else (Tencent Cloud console, local dev) we point to the
- * console domain so authenticated users land on the right tenant.
+ * 本项目在 EdgeOne Makers 的控制台项目 ID。
+ * 项目类型是 Git 集成（push 到 main 自动构建部署），所以不存在"一键部署
+ * 某个模板"的 URL——部署由本仓库的提交触发。这个角标指向本项目的部署记录，
+ * 而不是 starter 模板的新建项目页。
  */
-function getDeployUrl(): string {
-  const deployParams = `?template=${TEMPLATE}&from=within&fromAgent=1&agentLang=${AGENT_LANG}`;
-  const edgeoneDeployUrl = `https://edgeone.ai/makers/new${deployParams}`;
-  const cloudDeployUrl = `https://console.cloud.tencent.com/edgeone/makers/new${deployParams}`;
-
-  if (typeof window === 'undefined') return edgeoneDeployUrl;
-  return window.location.hostname.endsWith('.edgeone.dev') ? edgeoneDeployUrl : cloudDeployUrl;
-}
+const PROJECT_ID = 'makers-t9sghy2qvgjc';
+const DEPLOY_CONSOLE_URL = `https://console.cloud.tencent.com/edgeone/makers/project/${PROJECT_ID}/deployments`;
 
 /**
- * Floating rocket badge for one-click deploy. Pinned to the left of
- * the GitHub badge in the bottom-right viewport corner. A localised
- * tooltip floats above the badge on hover/focus.
+ * Floating rocket badge that opens this project's deployment console.
+ * Pinned to the left of the GitHub badge in the bottom-right viewport
+ * corner. A localised tooltip floats above the badge on hover/focus.
  */
 export default function DeployLink() {
   const [hover, setHover] = useState(false);
@@ -32,7 +22,7 @@ export default function DeployLink() {
 
   return (
     <a
-      href={getDeployUrl()}
+      href={DEPLOY_CONSOLE_URL}
       target='_blank'
       rel='noopener noreferrer'
       aria-label={label}

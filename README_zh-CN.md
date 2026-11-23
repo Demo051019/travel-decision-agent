@@ -4,7 +4,7 @@
 
 **Framework：** OpenAI Agents SDK · **Category：** Agent · **Language：** Python
 
-[![Deploy to EdgeOne Makers](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://console.cloud.tencent.com/edgeone/pages/new?template=openai-agents-starter-python)
+[![EdgeOne Makers](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://console.cloud.tencent.com/edgeone/makers/project/makers-t9sghy2qvgjc/index)
 
 <!-- ![preview](./assets/preview.png)  TODO: confirm -->
 
@@ -74,8 +74,8 @@ travel-decision-agent/
 ├── agents/                          # 有状态的 EdgeOne Makers Agent Functions（Python）
 │   ├── chat/index.py               # POST /chat —— SSE 流式聊天
 │   ├── chat/stop.py                # POST /chat/stop —— 中断当前 agent
-│   ├── _amap.py                    # 高德 Web 服务客户端（geocode / POI / 步行·公交·驾车路径）
-│   ├── _geo.py                     # 距离计算与加权排序（纯函数，无网络）
+│   ├── _amap.py                    # 高德 Web 服务客户端（geocode / POI / 步行·公交·驾车 v5 含实时路况）
+│   ├── _geo.py                     # 距离、加权排序、营业时间判断、路况汇总（纯函数，无网络）
 │   ├── _tools.py                   # 四个 Agent 工具（私有）
 │   ├── _prompts.py                 # instructions / 追问规则 / 失败话术
 │   └── _logger.py                  # 日志工具（私有）

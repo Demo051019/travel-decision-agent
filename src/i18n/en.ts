@@ -63,7 +63,7 @@ const en = {
   "lang.switch": "中文",
 
   // ─── Floating bottom-right action badges ─────────────────────────────
-  "floatingLink.deploy": "Deploy",
+  "floatingLink.deploy": "Deploy console",
   "floatingLink.github": "GitHub",
 } as const;
 

@@ -4,16 +4,22 @@ A full-stack EdgeOne Makers Agent: streaming chat backed by the OpenAI Agents SD
 
 **Framework:** OpenAI Agents SDK · **Category:** Agent · **Language:** Python
 
-[![Deploy to EdgeOne Makers](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://edgeone.ai/makers/new?template=openai-agents-starter-python&from=within&fromAgent=1&agentLang=python)
+[![EdgeOne Makers](https://cdnstatic.tencentcs.com/edgeone/pages/deploy.svg)](https://console.cloud.tencent.com/edgeone/makers/project/makers-t9sghy2qvgjc/index)
 
 <!-- ![preview](./assets/preview.png)  TODO: confirm -->
 
 ## Overview
 
-A minimal, production-shaped Python starter that wires the OpenAI Agents SDK into EdgeOne Makers. Demonstrates the full chat loop — SSE streaming, custom tool registration, conversation persistence — so you can fork it and start replacing the toy tools (`get_weather`, `get_clothing_advice`, `translate_text`, `text_statistics`) with real ones.
+Ask it "I'm at Shenzhen North Station, which mall nearby has a Uniqlo, and which is closest?" and it resolves the location, pulls real malls from Amap, checks whether the brand actually has a store inside or around each one, ranks them in code, and tells you how long walking / transit / taxi would take — plus whether the mall is still open and whether the road is congested right now.
+
+The LLM only organises language. Distances, rankings, transit times and traffic levels are all computed in Python from Amap's response, so the numbers are reproducible and never invented.
 
 - **SSE streaming chat** — token-by-token `text_delta` events plus `tool_called` events.
-- **Custom Agent tools** — four sample `@function_tool` definitions, ready to be replaced.
+- **Four real Amap-backed tools** — `resolve_location`, `search_nearby_malls`, `check_brands_in_malls`, `rank_and_recommend`.
+- **Decisions computed in code** — haversine distance, weighted ranking (distance / brand hit / rating), transit fares and walking times come from Amap route planning, not from the model.
+- **Live traffic** — the top 3 malls each get walking / transit / taxi options; taxi routes are fetched from Amap v5 driving with `show_fields=cost,tmcs` and summarised into 畅通 / 缓行 / 拥堵 / 严重拥堵.
+- **Opening hours** — POI `open_time` is parsed and compared with local time, so it warns you when a mall hasn't opened yet.
+- **Asks instead of guessing** — no location, ambiguous place name, or zero results triggers a clarifying question; tool failures are reported with the actual reason.
 - **Sticky conversation memory** — `context.store.openai_session(cid)` plugs straight into `Runner.run_streamed()`'s `session` parameter.
 - **Honest cancellation** — backend `context.utils.abort_active_run()` truly interrupts the LLM call.
 - **Two-folder backend** — long-running stateful work in `agents/`, short stateless `/history` in `cloud-functions/`.
@@ -27,7 +33,7 @@ A minimal, production-shaped Python starter that wires the OpenAI Agents SDK int
 | `AI_GATEWAY_MODEL` | No | Model ID. Defaults to `@makers/deepseek-v4-flash` (a free built-in model). |
 | `AMAP_API_KEY` | Yes | Amap (高德) Web Service key for geocoding, POI search, and walking routes. Legacy name `AMAP_KEY` is also accepted. |
 
-This template follows the OpenAI-compatible standard — point these at Makers Models or any compatible provider.
+This project follows the OpenAI-compatible standard — point these at Makers Models or any compatible provider.
 
 ### How to get `AI_GATEWAY_API_KEY`
 
@@ -54,12 +60,15 @@ Local agent metrics & traces are exposed at `http://localhost:8080/agent-metrics
 ## Project Structure
 
 ```text
-openAI-agent-starter-python/
+travel-decision-agent/
 ├── agents/                          # Stateful EdgeOne Makers Agent Functions (Python)
 │   ├── chat/index.py               # POST /chat — SSE streaming chat
 │   ├── chat/stop.py                # POST /chat/stop — abort active run
-│   ├── _logger.py                  # Logger utility (private)
-│   └── _tools.py                   # Agent tool definitions (private)
+│   ├── _amap.py                    # Amap Web Service client (geocode / POI / walking / transit / driving v5)
+│   ├── _geo.py                     # Distance, ranking, opening hours, traffic summary (pure functions)
+│   ├── _prompts.py                 # Agent instructions, clarification rules, failure wording
+│   ├── _tools.py                   # The four @function_tool definitions + search cache
+│   └── _logger.py                  # Logger utility (private)
 ├── cloud-functions/                 # Stateless EdgeOne Makers Python cloud functions
 │   ├── history/index.py            # POST /history — load conversation messages
 │   └── _logger.py                  # Logger utility
