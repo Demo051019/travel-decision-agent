@@ -135,7 +135,8 @@
 .metrics {
   display: flex;
   flex-wrap: wrap;
-  gap: 32px;
+  align-items: baseline;
+  gap: 28px;
   margin-top: 26px;
   padding-top: 20px;
   border-top: 1px solid var(--bg-border);
@@ -143,8 +144,8 @@
 
 .metric {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: baseline;
+  gap: 6px;
 }
 
 .metricValue {
