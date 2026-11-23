@@ -44,7 +44,7 @@ export const projects: Project[] = [
     subtitle: '一句话问出「去哪、怎么去、现在堵不堵」。',
     summary:
       '把定位解析、商场检索、品牌核对、路线与实时路况串成一条可观测的工具链。回答不是泛泛的建议，而是带步行、公交、打车三种方案和当前路况的具体去处。',
-    role: '独立开发 · 全栈',
+    role: 'Agent · 地图开发',
     year: '2026',
     stack: ['React', 'TypeScript', 'Python', 'OpenAI Agents SDK', '高德 API', 'SSE'],
     metrics: [

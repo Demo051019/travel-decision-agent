@@ -197,10 +197,11 @@
 }
 
 .stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
-  max-width: 520px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 32px;
+  max-width: 620px;
   margin-top: 76px;
   padding-top: 22px;
   border-top: 1px solid var(--bg-border);
@@ -208,8 +209,8 @@
 
 .stat {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: baseline;
+  gap: 8px;
 }
 
 .statValue {
