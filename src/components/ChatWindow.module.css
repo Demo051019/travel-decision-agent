@@ -27,6 +27,12 @@
   width: 0;
   height: 0;
 }
+
+/* The default 0.45 opacity is tuned for a dark surface; on paper it
+   washes the copy out too much. */
+:root[data-theme='light'] .empty {
+  opacity: 0.72;
+}
 .emptyIcon {
   font-size: 3rem;
   color: var(--accent-gold);
