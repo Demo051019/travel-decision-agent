@@ -15,6 +15,9 @@
 - **四段式工具链** —— `resolve_location` → `search_nearby_malls` → `check_brands_in_malls` → `rank_and_recommend`。
 - **search_id 传递** —— 候选商场缓存在服务端，工具之间只传一个短 ID，不让模型转抄 JSON（转抄会丢字段且浪费上下文）。
 - **排序在代码里算** —— 距离/品牌命中/评分三项加权，结果可复现；模型不许自己估算数字。
+- **交通方案对比** —— 前 3 名各算步行、公交/地铁（含票价与线路）、打车三种耗时，来自高德路径规划而非直线换算。
+- **实时路况** —— 用高德 v5 驾车接口的逐段 `tmc`（畅通/缓行/拥堵）判断「现在堵不堵」，并给出拥堵里程与占比；拿不到数据时如实说未知。
+- **营业状态** —— 读取 POI 的 `open_time` 由代码判断当前是否营业，打烊会主动提醒。
 - **信息不足主动追问** —— 没给位置、地点有歧义、范围内无结果时先问清楚，不猜。
 - **失败必给原因** —— 工具不抛异常，统一返回 `error_code` + `reason` + `hint`，模型据此解释"为什么没查成"。
 - **SSE 流式聊天** —— 逐 token 推 `text_delta`，命中工具时推 `tool_called`。
@@ -71,7 +74,7 @@ travel-decision-agent/
 ├── agents/                          # 有状态的 EdgeOne Makers Agent Functions（Python）
 │   ├── chat/index.py               # POST /chat —— SSE 流式聊天
 │   ├── chat/stop.py                # POST /chat/stop —— 中断当前 agent
-│   ├── _amap.py                    # 高德 Web 服务客户端（geocode / POI / 步行路径）
+│   ├── _amap.py                    # 高德 Web 服务客户端（geocode / POI / 步行·公交·驾车路径）
 │   ├── _geo.py                     # 距离计算与加权排序（纯函数，无网络）
 │   ├── _tools.py                   # 四个 Agent 工具（私有）
 │   ├── _prompts.py                 # instructions / 追问规则 / 失败话术

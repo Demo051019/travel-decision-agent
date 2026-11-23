@@ -15,6 +15,7 @@ const zh = {
   // Preset questions
   "preset.1": "我在深圳北站，附近 3 公里有哪些商场？",
   "preset.2": "我想买优衣库，附近哪家商场有？哪家最近？",
+  "preset.3": "现在去缤果空间堵不堵？打车和地铁哪个快？",
 
   // Tool indicators
   "tool.locate": "定位解析",
@@ -33,6 +34,13 @@ const zh = {
   "debug.clear": "清除",
   "debug.empty": "等待 SSE 事件...",
   "debug.emptyHint": "发送消息后，所有原始后端数据将在此处显示。",
+  "debug.tabSteps": "步骤",
+  "debug.tabRaw": "原始数据",
+  "debug.stepHint": "发送消息后，这里按顺序显示 Agent 做了什么。",
+  "debug.stepAnswer": "生成回答",
+  "debug.stepDone": "完成",
+  "debug.stepError": "出错",
+  "debug.stepCount": "步",
 
   // Conversation sidebar
   "sidebar.label": "会话列表",

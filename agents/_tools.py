@@ -55,6 +55,9 @@ _PREFERENCE_LABELS = {
 
 _QUOTA_HINT = "这项信息暂时查不到，可以稍后再试，或直接告诉我商场名称我来核对"
 
+# 支持的交通方式；不认识的值会被丢弃，全部丢弃时回落到步行
+_VALID_MODES = {"walk", "transit", "drive"}
+
 # 高德在只匹配到一部分时会返回「省级/市级」这种粗糙兜底坐标，
 # 它跟真正的同名地点不是一回事，参与歧义判断会造成大量误追问。
 # 例：搜「深圳北站」会返回「深圳北站(公交站)」+「广东省深圳市(level=市)」。
@@ -227,6 +230,9 @@ async def search_nearby_malls(
     for mall in malls:
         mall["distance_text"] = _geo.format_distance(mall.get("distance_m"))
         mall["walk_minutes"] = _geo.walk_minutes(mall.get("distance_m"))
+        # 顺手算一次「现在是否营业」：高德给的 open_time 是机器可判断的区间，
+        # 由代码算比让模型看字符串猜可靠。
+        mall["is_open_now"] = _geo.is_open_now(mall.get("open_time"))
 
     search_id = _cache_put(malls, {"lng": float(lng), "lat": float(lat)}, radius)
 
@@ -245,6 +251,9 @@ async def search_nearby_malls(
                     "walk_minutes": m.get("walk_minutes"),
                     "rating": m.get("rating"),
                     "address": m.get("address"),
+                    "open_time": m.get("open_time_desc") or m.get("open_time") or "",
+                    "is_open_now": m.get("is_open_now"),
+                    "city": m.get("city") or "",
                 }
                 for m in malls
             ],
@@ -381,12 +390,19 @@ async def check_brands_in_malls(
 async def rank_and_recommend(
     search_id: Annotated[str, "search_nearby_malls 返回的 search_id，原样传入"],
     preference: Annotated[str, "排序偏好：balanced=综合(默认) / nearest=最近 / brand=品牌优先 / rating=评分优先"] = "balanced",
-    refine_walking: Annotated[bool, "是否为前 3 名精算真实步行距离，默认 True"] = True,
+    travel_modes: Annotated[
+        str, "要计算的交通方式，逗号分隔：walk=步行 / transit=公交地铁 / drive=打车。默认 walk,transit"
+    ] = "walk,transit",
 ) -> str:
-    """按 search_id 里的候选商场做加权排序，输出前 3 名及各自的具体推荐理由。
+    """按 search_id 里的候选商场做加权排序，输出前 3 名及各自的行程方案。
 
-    会自动合并同一次检索里的品牌核对结果（如果有）。
+    会自动合并同一次检索里的品牌核对结果（如果有），并计算：
+      · 真实步行 / 公交 / 驾车耗时（不是直线距离换算）
+      · 当前是否在营业时间内
+
     打分权重按偏好切换：距离、品牌命中、评分三项加权。
+    想比较「打车快多少」就传 travel_modes="walk,transit,drive"；
+    只要步行就传 "walk"（最快，少调两次接口）。
     """
     entry = _cache_get(search_id)
     if not entry:
@@ -402,6 +418,11 @@ async def rank_and_recommend(
                 "question": "要我先按你的位置搜一下附近的商场吗？告诉我大概地点就行。",
             }
         )
+
+    # 营业状态在检索阶段已算过一次；老缓存（进程未重启前写入的）可能缺这个字段
+    for mall in malls:
+        if mall.get("is_open_now") is None:
+            mall["is_open_now"] = _geo.is_open_now(mall.get("open_time"))
 
     brand: str | None = entry.get("brand")
     matches: list[dict[str, Any]] | None = entry.get("brand_matches")
@@ -422,33 +443,117 @@ async def rank_and_recommend(
     pref = (preference or "balanced").strip().lower()
     ranked = _geo.rank_candidates(candidates, preference=pref, brand=brand)
 
-    # 可选：为前 3 名精算真实步行距离，让"步行 X 分钟"更可信
+    # 交通方案：步行每次必算（作为基准），公交/驾车按需追加。
+    # 只算前 3 名：候选十几家全算会让接口调用量翻几倍，而用户只看前几名。
+    modes = [m.strip().lower() for m in (travel_modes or "").split(",") if m.strip()]
+    modes = [m for m in modes if m in _VALID_MODES] or ["walk"]
+
     origin = entry.get("origin") or {}
     origin_lng, origin_lat = origin.get("lng"), origin.get("lat")
-    if refine_walking and isinstance(origin_lng, (int, float)) and isinstance(origin_lat, (int, float)):
+    has_origin = isinstance(origin_lng, (int, float)) and isinstance(origin_lat, (int, float))
+    # 公交接口必须带城市；商场 POI 自带的 cityname 比让模型再传一次更可靠
+    city = next((m.get("city") for m in malls if m.get("city")), "")
+    failures: list[str] = []
+
+    if has_origin:
         semaphore = asyncio.Semaphore(_CONCURRENCY)
 
-        async def refine(item: dict[str, Any]) -> None:
+        async def enrich(item: dict[str, Any]) -> None:
             lng, lat = item.get("lng"), item.get("lat")
             if not isinstance(lng, (int, float)) or not isinstance(lat, (int, float)):
                 return
+
+            options: list[dict[str, Any]] = []
             async with semaphore:
                 try:
                     route = await _amap.walking_route((origin_lng, origin_lat), (lng, lat))
-                except _amap.AmapError:
-                    return  # 精算失败就保留直线距离，不影响推荐
-            item["straight_distance_m"] = item.get("distance_m")
-            item["distance_m"] = route["distance_m"]
-            item["distance_text"] = _geo.format_distance(route["distance_m"])
-            duration = route.get("duration_s")
-            item["walk_minutes"] = (
-                max(1, round(duration / 60)) if duration else _geo.walk_minutes(route["distance_m"])
-            )
-            item["distance_source"] = "步行路线"
+                except _amap.AmapError as exc:
+                    failures.append(f"步行（{exc.reason}）")
+                else:
+                    # 精算成功就改用真实步行距离；精算失败保留直线距离，不影响推荐
+                    item["straight_distance_m"] = item.get("distance_m")
+                    item["distance_m"] = route["distance_m"]
+                    item["distance_source"] = "步行路线"
+                    duration = route.get("duration_s")
+                    item["walk_minutes"] = (
+                        max(1, round(duration / 60))
+                        if duration
+                        else _geo.walk_minutes(route["distance_m"])
+                    )
+                    options.append(
+                        _geo.build_travel_option("walk", route["distance_m"], duration)
+                    )
 
-        await asyncio.gather(*(refine(item) for item in ranked))
+                if "transit" in modes:
+                    try:
+                        transit = await _amap.transit_route(
+                            (origin_lng, origin_lat), (lng, lat), city
+                        )
+                    except _amap.AmapError as exc:
+                        failures.append(f"公交（{exc.reason}）")
+                    else:
+                        options.append(
+                            _geo.build_travel_option(
+                                "transit",
+                                transit.get("distance_m") or item.get("distance_m"),
+                                transit.get("duration_s"),
+                                transit.get("cost_yuan"),
+                                transit.get("lines"),
+                            )
+                        )
+
+                if "drive" in modes:
+                    try:
+                        drive = await _amap.driving_route(
+                            (origin_lng, origin_lat), (lng, lat)
+                        )
+                    except _amap.AmapError as exc:
+                        failures.append(f"驾车（{exc.reason}）")
+                    else:
+                        option = _geo.build_travel_option(
+                            "drive", drive["distance_m"], drive["duration_s"]
+                        )
+                        # 实时路况：只有 v5 能给出逐段 tmc；拿不到就把 level 置 None，
+                        # 让模型说"未知"而不是默认"畅通"。
+                        traffic = _geo.summarize_traffic(
+                            drive.get("traffic_segments"), drive.get("distance_m")
+                        )
+                        option["traffic_level"] = traffic.get("level")
+                        option["traffic_text"] = traffic.get("text")
+                        option["traffic_detail"] = traffic.get("detail")
+                        option["congested_m"] = traffic.get("congested_m")
+                        option["congested_share"] = traffic.get("congested_share")
+                        option["traffic_source"] = drive.get("traffic_source", "")
+                        option["text"] += (
+                            f"，{traffic['level']}（{traffic['text']}）"
+                            if traffic.get("level")
+                            else "，实时路况未知"
+                        )
+                        options.append(option)
+
+            item["travel_options"] = options
+
+        await asyncio.gather(*(enrich(item) for item in ranked))
+        # 距离被真实路线替换后，理由里的「步行约 X 分钟」必须一起重算
+        _geo.refresh_reasons(ranked, brand)
 
     best = ranked[0] if ranked else None
+    best_drive = next(
+        (o for o in ((best or {}).get("travel_options") or []) if o.get("mode") == "drive"),
+        None,
+    )
+    traffic_now = {
+        "available": bool(best_drive and best_drive.get("traffic_level")),
+        "level": (best_drive or {}).get("traffic_level"),
+        "text": (best_drive or {}).get("traffic_text"),
+        "detail": (best_drive or {}).get("traffic_detail"),
+        "congested_m": (best_drive or {}).get("congested_m"),
+        "congested_share": (best_drive or {}).get("congested_share"),
+        "for_mall": (best or {}).get("name"),
+        "checked_at": _geo.now_cst().strftime("%H:%M"),
+        "source": (best_drive or {}).get("traffic_source", ""),
+    }
+
     return _dumps(
         {
             "ok": True,
@@ -459,6 +564,16 @@ async def rank_and_recommend(
             "brand": brand,
             "count": len(ranked),
             "best_pick": best.get("name") if best else None,
+            "travel_modes_requested": modes,
+            "travel_city": city,
+            "travel_note": (
+                "交通耗时来自高德路径规划；公交票价单位为元。"
+                "drive 方案的 traffic_level 是请求时刻的实时路况（v5 tmc），"
+                "级别为 null 表示这条路线没有可用路况数据，不要当成畅通。"
+                "商场类 POI 没有人均消费数据，不要估算。"
+            ),
+            "traffic_now": traffic_now,
+            "travel_failed": sorted(set(failures)),
             "recommendations": [
                 {
                     "rank": item["rank"],
@@ -467,8 +582,11 @@ async def rank_and_recommend(
                     "walk_minutes": item.get("walk_minutes"),
                     "distance_source": item.get("distance_source", "直线距离"),
                     "rating": item.get("rating"),
+                    "open_time": item.get("open_time_desc") or item.get("open_time") or "",
+                    "is_open_now": item.get("is_open_now"),
                     "brand_found": item.get("brand_found"),
                     "brand_stores": [s.get("name") for s in (item.get("brand_stores") or [])][:2],
+                    "travel_options": item.get("travel_options") or [],
                     "score": item.get("score"),
                     "reason": item.get("reason"),
                 }

@@ -15,6 +15,7 @@ const en = {
   // Preset questions
   "preset.1": "I'm at Shenzhen North Station — which malls are within 3 km?",
   "preset.2": "I want to buy from Uniqlo. Which nearby mall has one, and which is closest?",
+  "preset.3": "Is traffic bad to Bingo Space right now? Taxi or metro — which is faster?",
 
   // Tool indicators
   "tool.locate": "Geocode",
@@ -33,6 +34,13 @@ const en = {
   "debug.clear": "Clear",
   "debug.empty": "Waiting for SSE events...",
   "debug.emptyHint": "After sending a message, all raw backend data will be displayed here.",
+  "debug.tabSteps": "Steps",
+  "debug.tabRaw": "Raw",
+  "debug.stepHint": "After sending a message, the Agent's steps appear here in order.",
+  "debug.stepAnswer": "Writing answer",
+  "debug.stepDone": "Done",
+  "debug.stepError": "Error",
+  "debug.stepCount": "steps",
 
   // Conversation sidebar
   "sidebar.label": "Conversation list",

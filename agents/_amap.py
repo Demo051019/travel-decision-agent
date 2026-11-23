@@ -23,6 +23,8 @@ from typing import Any
 import httpx
 
 _BASE_URL = "https://restapi.amap.com/v3"
+# v5 才返回逐段实时路况（tmcs）；v3 的 tmcs 全是 null，实测不可用
+_BASE_V5 = "https://restapi.amap.com/v5"
 _TIMEOUT = httpx.Timeout(10.0, connect=5.0)
 
 # 高德 POI 分类码：购物服务(06) - 商场(060100)。
@@ -94,11 +96,11 @@ def api_key() -> str:
     return key
 
 
-async def _request_once(path: str, query: dict[str, Any]) -> dict[str, Any]:
+async def _request_once(path: str, query: dict[str, Any], base: str = _BASE_URL) -> dict[str, Any]:
     """发一次请求，把 HTTP 层与平台层错误都翻译成 AmapError。"""
     try:
         async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
-            resp = await client.get(f"{_BASE_URL}{path}", params=query)
+            resp = await client.get(f"{base}{path}", params=query)
     except httpx.TimeoutException as exc:
         raise AmapError(
             "HTTP_TIMEOUT", "高德接口响应超时", "稍后重试；若持续超时请检查服务器出口网络"
@@ -131,14 +133,14 @@ async def _request_once(path: str, query: dict[str, Any]) -> dict[str, Any]:
     return data
 
 
-async def _request(path: str, params: dict[str, Any]) -> dict[str, Any]:
+async def _request(path: str, params: dict[str, Any], base: str = _BASE_URL) -> dict[str, Any]:
     """带退避重试的请求入口：限流类错误自动重试，其余直接抛出。"""
     query = {**params, "key": api_key(), "output": "JSON"}
 
     last: AmapError | None = None
     for attempt in range(_MAX_RETRIES + 1):
         try:
-            return await _request_once(path, query)
+            return await _request_once(path, query, base=base)
         except AmapError as exc:
             last = exc
             if exc.code in _RETRYABLE_CODES and attempt < _MAX_RETRIES:
@@ -234,6 +236,12 @@ async def malls_around(
             continue
         biz = item.get("biz_ext")
         rating = _to_float(biz.get("rating")) if isinstance(biz, dict) else None
+        # 营业时间：open_time 是「10:00-22:00」这种机器可判断的区间，
+        # opentime2 带周末差异，给用户看的更完整。
+        # 注意：商场类 POI 的 biz_ext.cost 实测是空数组（只有餐饮才有人均），
+        # 所以不要假装能算「人均消费」。
+        open_time = _to_text(biz.get("open_time")) if isinstance(biz, dict) else ""
+        open_time_desc = _to_text(biz.get("opentime2")) if isinstance(biz, dict) else ""
         malls.append(
             {
                 "id": _to_text(item.get("id")),
@@ -245,6 +253,10 @@ async def malls_around(
                 "distance_m": _to_int(item.get("distance")),
                 "rating": rating,
                 "category": _to_text(item.get("type")).split(";")[-1],
+                "open_time": open_time,
+                "open_time_desc": open_time_desc or open_time,
+                "city": _to_text(item.get("cityname")),
+                "tel": _to_text(item.get("tel")),
             }
         )
     return malls
@@ -308,3 +320,131 @@ async def walking_route(
     distance = _to_int(first.get("distance")) or 0
     duration = _to_int(first.get("duration")) or 0
     return {"distance_m": distance, "duration_s": duration}
+
+
+_KEY_ERROR_CODES = {"10001", "10002", "10005", "10009"}
+
+
+def _parse_tmcs(path: dict[str, Any]) -> list[dict[str, Any]]:
+    """抽取逐段实时路况。v5 的字段是 tmc_status / tmc_distance。"""
+    segments: list[dict[str, Any]] = []
+    for step in path.get("steps") or []:
+        for tmc in step.get("tmcs") or []:
+            status = _to_text(tmc.get("tmc_status")) or "未知"
+            distance = _to_int(tmc.get("tmc_distance")) or 0
+            if distance > 0:
+                segments.append({"status": status, "distance_m": distance})
+    return segments
+
+
+async def driving_route(
+    origin: tuple[float, float],
+    destination: tuple[float, float],
+) -> dict[str, Any]:
+    """驾车路径规划（打车实际走这条路线），并尽量带回逐段实时路况。
+
+    优先 v5（show_fields=cost,tmcs）—— 实测只有 v5 返回 tmc_status，
+    v3 的 tmcs 字段是 null，拿不到拥堵状态。
+    v5 不可用时退回 v3；此时 traffic_segments 为空，上层必须如实说
+    「实时路况未知」，不能默认成畅通。
+
+    耗时是含当前路况的实时耗时，不是理论时长。
+    """
+    params = {
+        "origin": f"{origin[0]},{origin[1]}",
+        "destination": f"{destination[0]},{destination[1]}",
+    }
+
+    v5_error = ""
+    try:
+        data = await _request(
+            "/direction/driving",
+            {**params, "show_fields": "cost,tmcs", "strategy": 32},
+            base=_BASE_V5,
+        )
+        source = "v5"
+    except AmapError as exc:
+        # Key/权限类错误重试也没用，直接抛给上层说明原因
+        if exc.code in _KEY_ERROR_CODES:
+            raise
+        v5_error = exc.reason
+        data = await _request("/direction/driving", {**params, "extensions": "base"})
+        source = "v3"
+
+    paths = ((data.get("route") or {}).get("paths")) or []
+    if not paths:
+        raise AmapError(
+            "NO_ROUTE",
+            "两点之间没有可用的驾车路线",
+            "可能距离过近或道路数据缺失，建议改用步行方案",
+        )
+
+    first = paths[0]
+    cost = first.get("cost") or {}
+    duration = _to_int(cost.get("duration")) or _to_int(first.get("duration")) or 0
+
+    return {
+        "distance_m": _to_int(first.get("distance")) or 0,
+        "duration_s": duration,
+        "tolls_yuan": _to_float(first.get("tolls")),
+        "traffic_lights": _to_int(cost.get("traffic_lights")),
+        "traffic_segments": _parse_tmcs(first) if source == "v5" else [],
+        "traffic_source": "v5 实时路况" if source == "v5" else "v3（无实时路况）",
+        "traffic_note": v5_error,
+    }
+
+
+async def transit_route(
+    origin: tuple[float, float],
+    destination: tuple[float, float],
+    city: str,
+) -> dict[str, Any]:
+    """公交/地铁路径规划。city 必传（城市名或 adcode），否则高德会报参数错误。"""
+    if not city or not city.strip():
+        raise AmapError(
+            "NO_CITY",
+            "缺少城市信息，无法规划公交路线",
+            "先定位到具体城市；或改用步行/驾车方案",
+        )
+
+    data = await _request(
+        "/direction/transit/integrated",
+        {
+            "origin": f"{origin[0]},{origin[1]}",
+            "destination": f"{destination[0]},{destination[1]}",
+            "city": city.strip(),
+            "cityd": city.strip(),
+            "strategy": 0,
+            "nightflag": 0,
+        },
+    )
+
+    transits = ((data.get("route") or {}).get("transits")) or []
+    if not transits:
+        raise AmapError(
+            "NO_TRANSIT",
+            "两地之间没有可用的公交/地铁路线",
+            "可能距离过近，建议直接步行",
+        )
+
+    first = transits[0]
+    lines: list[str] = []
+    for segment in first.get("segments") or []:
+        bus = ((segment.get("bus") or {}).get("buslines")) or []
+        if bus:
+            name = _to_text((bus[0] or {}).get("name"))
+            if name:
+                lines.append(name)
+            continue
+        railway = segment.get("railway") or {}
+        rail_name = _to_text(railway.get("name"))
+        if rail_name:
+            lines.append(rail_name)
+
+    return {
+        "distance_m": _to_int(first.get("distance")) or 0,
+        "duration_s": _to_int(first.get("duration")) or 0,
+        "cost_yuan": _to_float(first.get("cost")),
+        "walking_m": _to_int(first.get("walking_distance")),
+        "lines": lines,
+    }
