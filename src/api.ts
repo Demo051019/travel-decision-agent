@@ -42,6 +42,30 @@ export interface StreamCallbacks {
   onRawEvent?: (event: RawSseEvent) => void;
 }
 
+/**
+ * Carries the upstream status through to the UI.
+ *
+ * The backend already forwards `status` / `errorType` / `detail` on the SSE
+ * `error` event, but the old code wrapped everything in a bare Error, so a
+ * 402 quota exhaustion and a dead service looked identical to the user.
+ */
+export class AgentError extends Error {
+  status?: number;
+  errorType?: string;
+  detail?: unknown;
+
+  constructor(
+    message: string,
+    opts: { status?: number; errorType?: string; detail?: unknown } = {},
+  ) {
+    super(message);
+    this.name = 'AgentError';
+    this.status = opts.status;
+    this.errorType = opts.errorType;
+    this.detail = opts.detail;
+  }
+}
+
 /** Get conversation history for restoring the chat window after page refresh. */
 export async function fetchConversationHistory(
   conversationId: string,
@@ -118,7 +142,8 @@ export function sendMessageStream(
       });
 
       if (!res.ok) {
-        callbacks.onError(new Error(`HTTP ${res.status}: ${await res.text().catch(() => '')}`));
+        const body = await res.text().catch(() => '');
+        callbacks.onError(new AgentError(body || `HTTP ${res.status}`, { status: res.status }));
         return;
       }
 
@@ -198,7 +223,11 @@ function dispatchSseChunk(part: string, cb: StreamCallbacks, markDone: () => voi
         cb.onToolCalled(parsed.tool);
         break;
       case 'error':
-        cb.onError(new Error(parsed.message || 'agent returned error'));
+        cb.onError(new AgentError(parsed.message || 'agent returned error', {
+          status: typeof parsed.status === 'number' ? parsed.status : undefined,
+          errorType: typeof parsed.errorType === 'string' ? parsed.errorType : undefined,
+          detail: parsed.detail,
+        }));
         break;
       case 'done':
         markDone();

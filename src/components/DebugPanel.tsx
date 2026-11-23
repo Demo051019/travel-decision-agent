@@ -79,10 +79,16 @@ export default function DebugPanel({ events, onClear }: Props) {
       }
 
       if (evt.eventType === 'done' || evt.eventType === 'error') {
+        const err = evt.data as { message?: string; status?: number } | null;
         list.push({
           id: `${evt.timestamp}-${evt.eventType}`,
           icon: evt.eventType === 'done' ? '✅' : '⚠️',
           label: evt.eventType === 'done' ? t('debug.stepDone') : t('debug.stepError'),
+          // Surface the upstream status/reason here too, so diagnosing a
+          // failure doesn't require switching to the raw JSON tab.
+          detail: evt.eventType === 'error'
+            ? [err?.status, err?.message].filter(Boolean).join(' · ')
+            : undefined,
           gapMs: gapTo(evt.timestamp),
           at: evt.timestamp,
         });

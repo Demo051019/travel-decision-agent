@@ -5,6 +5,7 @@ import type {
   ConversationSummary,
 } from './types';
 import {
+  AgentError,
   fetchConversationHistory,
   sendMessageStream,
   stopAgent,
@@ -405,9 +406,17 @@ function AppInner() {
         void refreshConversations('replace');
       },
 
-      onError() {
+      onError(err) {
         clearBotStreaming();
-        updateBotMessage(content => content || t("status.error"));
+        // Distinguish "quota exhausted" from "service down" — otherwise every
+        // failure looks like a deployment problem.
+        const status = err instanceof AgentError ? err.status : undefined;
+        const key: MessageKeys =
+          status === 402 ? 'status.quota'
+            : status === 429 ? 'status.rateLimit'
+              : status && status >= 500 ? 'status.upstream'
+                : 'status.error';
+        updateBotMessage(content => content || t(key));
         finishStream();
       },
     }, conversationIdRef.current, {

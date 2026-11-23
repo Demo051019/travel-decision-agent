@@ -24,7 +24,10 @@ const en = {
   "tool.rank": "Rank & pick",
 
   // Status & errors
-  "status.error": "Request failed. Please check if the backend service is running.",
+  "status.error": "⚠️ Request failed. Please try again.",
+  "status.quota": "⚠️ Demo quota exhausted (402). The model is unavailable for now.",
+  "status.rateLimit": "⚠️ Too many requests (429). Wait a few seconds and retry.",
+  "status.upstream": "⚠️ Upstream model service is temporarily unavailable.",
   "status.stopped": "⏹ *Generation stopped*",
   "status.backendError": "Backend abort request failed. The server may still be running.",
 

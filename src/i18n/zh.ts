@@ -24,7 +24,10 @@ const zh = {
   "tool.rank": "排序推荐",
 
   // Status & errors
-  "status.error": "⚠️ 请求失败，请检查后端服务是否启动。",
+  "status.error": "⚠️ 请求失败，请稍后重试。",
+  "status.quota": "⚠️ 演示额度已用完（402），模型暂时无法回答，请稍后再试。",
+  "status.rateLimit": "⚠️ 请求太频繁（429），等几秒再试。",
+  "status.upstream": "⚠️ 上游模型服务暂时不可用，请稍后重试。",
   "status.stopped": "⏹ *已停止生成*",
   "status.backendError": "⚠️ 后端中断请求失败，服务端可能仍在运行。",
 
