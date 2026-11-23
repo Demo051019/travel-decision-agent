@@ -40,7 +40,7 @@
   align-items: center;
   gap: 8px;
   font-family: var(--font-display);
-  font-size: 0.7rem;
+  font-size: .825rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -63,7 +63,7 @@
   background: rgba(245, 200, 66, 0.08);
   color: var(--accent-gold);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.04em;
   cursor: pointer;
@@ -149,7 +149,7 @@
 .itemTitle {
   flex: 1;
   min-width: 0;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -161,14 +161,14 @@
 }
 .itemTime {
   flex-shrink: 0;
-  font-size: 10px;
+  font-size: 12px;
   color: var(--text-muted);
   letter-spacing: 0.02em;
 }
 
 .itemPreview {
   margin-top: 4px;
-  font-size: 10.5px;
+  font-size: 12.5px;
   line-height: 1.4;
   color: var(--text-muted);
   display: -webkit-box;
@@ -236,14 +236,14 @@
 
 .emptyTitle {
   font-family: var(--font-display);
-  font-size: 0.78rem;
+  font-size: .905rem;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-secondary);
 }
 .emptyHint {
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.5;
   color: var(--text-muted);
 }
@@ -275,7 +275,7 @@
   border: 1px solid var(--bg-border);
   color: var(--text-secondary);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.04em;
   cursor: pointer;
   transition: background var(--transition-fast),

@@ -74,7 +74,7 @@
   position: relative;
   z-index: 1;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.22em;
   color: color-mix(in srgb, var(--accent, #f5c842) 80%, var(--text-primary));
 }
@@ -102,7 +102,7 @@
 
 .meta {
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 12.5px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--text-muted);
@@ -127,7 +127,7 @@
 
 .summary {
   margin-top: 14px;
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1.85;
   color: var(--text-secondary);
 }
@@ -154,7 +154,7 @@
 }
 
 .metricLabel {
-  font-size: 10.5px;
+  font-size: 12.5px;
   letter-spacing: 0.12em;
   color: var(--text-muted);
 }
@@ -173,7 +173,7 @@
   border: 1px solid var(--bg-border);
   border-radius: 999px;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.03em;
   color: var(--text-secondary);
   white-space: nowrap;
@@ -197,7 +197,7 @@
   background: var(--accent, #f5c842);
   color: var(--gold-ink);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 14px;
   text-decoration: none;
   transition: filter 160ms ease, transform 160ms ease;
 }
@@ -209,7 +209,7 @@
 
 .link {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 14px;
   color: var(--text-secondary);
   text-decoration: none;
   border-bottom: 1px solid var(--bg-border);

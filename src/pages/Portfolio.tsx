@@ -61,8 +61,9 @@ export default function Portfolio() {
               <span className={styles.accent}>能用的判断。</span>
             </h1>
             <p className={styles.lead}>
-              我是 Demo，大三在读。做过一个能查实时路况的出行决策 Agent，也做数据清洗与分析。
-              比起堆功能，我更在意答案能不能直接拿来用。
+              我是 Demo，大三在读。
+              <br />
+              做过一个能查实时路况的出行决策 Agent，也做数据清洗与分析。比起堆叠功能，我更在意成果是否能够被量化。
             </p>
 
             <div className={styles.actions}>

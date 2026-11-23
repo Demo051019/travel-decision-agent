@@ -19,7 +19,7 @@
   padding-bottom: 12px;
   overflow-y: auto;
   scrollbar-width: none;
-  opacity: .45;
+  opacity: .62;
   animation: fadeUp .5s ease both;
 }
 
@@ -31,7 +31,7 @@
 /* The default 0.45 opacity is tuned for a dark surface; on paper it
    washes the copy out too much. */
 :root[data-theme='light'] .empty {
-  opacity: 0.72;
+  opacity: 0.8;
 }
 .emptyIcon {
   font-size: 3rem;
@@ -47,7 +47,7 @@
   text-transform: uppercase;
 }
 .emptyHint {
-  font-size: .75rem;
+  font-size: .875rem;
   color: var(--text-muted);
   letter-spacing: .04em;
   max-width: 460px;
@@ -55,7 +55,7 @@
   line-height: 1.6;
 }
 .emptyFeatures {
-  font-size: .68rem;
+  font-size: .805rem;
   color: var(--accent-gold);
   letter-spacing: .06em;
   margin-top: 4px;
@@ -78,7 +78,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: .85rem;
+  font-size: .975rem;
   color: var(--accent-gold);
   flex-shrink: 0;
 }

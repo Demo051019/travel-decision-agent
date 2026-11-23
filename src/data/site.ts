@@ -37,7 +37,7 @@ export const selfEvaluation = [
   },
   {
     label: '熟悉AI工具',
-    text: '对数据敏感且对 ai 及其产品有浓厚兴趣，希望在实习中积累真实项目经验',
+    text: '对数据敏感且对 AI 及其产品有浓厚兴趣，希望在实习中积累真实项目经验',
   },
   {
     label: '优秀协作能力',

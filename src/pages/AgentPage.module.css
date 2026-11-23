@@ -14,7 +14,7 @@
   background: var(--bg-base);
   color: var(--text-secondary);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 14px;
   letter-spacing: 0.06em;
 }
 
@@ -52,7 +52,7 @@
   padding-right: 14px;
   border-right: 1px solid var(--bg-border);
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 15px;
   letter-spacing: 0.02em;
   color: var(--text-secondary);
   text-decoration: none;
@@ -73,7 +73,7 @@
   .back {
     padding-right: 10px;
     margin-right: 0;
-    font-size: 12px;
+    font-size: 14px;
   }
 
   .topControls {

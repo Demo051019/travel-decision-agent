@@ -45,7 +45,7 @@
 
 .filename {
   font-family: 'DM Mono', monospace;
-  font-size: .72rem;
+  font-size: .845rem;
   color: #d4a85a;
   letter-spacing: .03em;
 }
@@ -57,14 +57,14 @@
 
 .lineCount {
   font-family: 'DM Mono', monospace;
-  font-size: .62rem;
+  font-size: .745rem;
   color: #5a4a2a;
   letter-spacing: .05em;
 }
 
 .badge {
   font-family: 'DM Mono', monospace;
-  font-size: .58rem;
+  font-size: .705rem;
   letter-spacing: .12em;
   color: #7a5c28;
   border: 1px solid #3a2e18;
@@ -106,7 +106,7 @@
 /* ── Code ──────────────────────────────────────────────────── */
 .code {
   font-family: 'DM Mono', monospace;
-  font-size: .7rem;
+  font-size: .825rem;
   line-height: 1.75;
   padding: 0 18px 0 0;
 }
@@ -177,7 +177,7 @@
   text-align: right;
   color: #3a3020;
   user-select: none;
-  font-size: .65rem;
+  font-size: .775rem;
   flex-shrink: 0;
 }
 
@@ -232,7 +232,7 @@
   border-top: 1px solid #1e1a0e;
   background: rgba(0,0,0,.2);
   font-family: 'DM Mono', monospace;
-  font-size: .58rem;
+  font-size: .705rem;
   letter-spacing: .07em;
   color: #4a3e22;
   flex-shrink: 0;

@@ -19,8 +19,8 @@
   --bg-strong: rgba(255, 255, 255, 0.08);
 
   --text-primary: #f0f0f8;
-  --text-secondary: #8888aa;
-  --text-muted: #5c5c72;
+  --text-secondary: #a3a3cc;
+  --text-muted: #7d7da0;
 
   --accent-gold: #f5c842;
   --accent-gold-dim: #f5c84230;
@@ -73,8 +73,8 @@
   --bg-strong: rgba(0, 0, 0, 0.075);
 
   --text-primary: #191920;
-  --text-secondary: #5c5c6b;
-  --text-muted: #8a8a96;
+  --text-secondary: #4a4a63;
+  --text-muted: #66667e;
 
   --accent-gold: #a57400;
   --accent-gold-dim: #a5740022;
@@ -155,7 +155,7 @@ body {
 .lang-toggle__label {
   display: inline-block;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 400;
   color: var(--text-secondary);
   transition: font-size 0.35s cubic-bezier(.4, 0, .2, 1),
@@ -175,7 +175,7 @@ body {
 }
 .lang-toggle__sep {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
   color: var(--text-muted);
   opacity: 0.5;
   margin: 0 3px;

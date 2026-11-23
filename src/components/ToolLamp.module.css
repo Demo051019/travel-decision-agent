@@ -12,7 +12,7 @@
   border: 1px solid var(--bg-border);
   background: var(--bg-elevated);
   font-family: var(--font-mono);
-  font-size: .68rem;
+  font-size: .805rem;
   color: var(--text-secondary);
   transition:
     color       300ms ease,
