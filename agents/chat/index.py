@@ -245,11 +245,18 @@ async def handler(context: Any) -> AsyncGenerator[str, None]:
         body_attr = getattr(e, "body", None)
         if body_attr and detail == str(e):
             detail = body_attr
+        # Surface which endpoint/model this runtime actually resolved. Env
+        # changes are invisible from the outside, and a 401 caused by a stale
+        # BASE_URL looks identical to a bad key.
+        from urllib.parse import urlparse
+        endpoint = os.getenv("AI_GATEWAY_BASE_URL", "")
         yield sse_event("error", {
             "message": str(e),
             "errorType": type(e).__name__,
             "status": status,
             "detail": detail,
+            "endpoint": urlparse(endpoint).hostname or endpoint,
+            "model": os.getenv("AI_GATEWAY_MODEL", ""),
         })
     finally:
         yield sse_event("done", {"stopped": stopped})
