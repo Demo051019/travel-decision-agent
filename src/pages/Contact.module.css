@@ -122,6 +122,53 @@
   margin-top: 32px;
 }
 
+/* ── Self evaluation ───────────────────────────────────────── */
+.section {
+  margin-top: 56px;
+  padding-top: 36px;
+  border-top: 1px solid var(--bg-border);
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+.evalList {
+  display: grid;
+  gap: 14px;
+  margin-top: 22px;
+  padding: 0;
+  list-style: none;
+}
+
+.evalItem {
+  position: relative;
+  padding-left: 20px;
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--text-secondary);
+}
+
+.evalItem::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 0.72em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-gold);
+}
+
+.evalItem strong {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
 .primary,
 .ghost {
   display: inline-flex;
@@ -181,5 +228,18 @@
 
   .title {
     font-size: clamp(36px, 12vw, 48px);
+  }
+
+  .section {
+    margin-top: 40px;
+    padding-top: 28px;
+  }
+
+  .sectionTitle {
+    font-size: 20px;
+  }
+
+  .evalItem {
+    font-size: 13.5px;
   }
 }

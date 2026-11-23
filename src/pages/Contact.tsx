@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { contact } from '../data/site';
+import { contact, selfEvaluation } from '../data/site';
 import ThemeToggle from '../components/ThemeToggle';
 import styles from './Contact.module.css';
 
@@ -62,6 +62,18 @@ export default function Contact() {
             </div>
           ))}
         </div>
+
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>自我评价</h2>
+          <ul className={styles.evalList}>
+            {selfEvaluation.map((item) => (
+              <li key={item.label} className={styles.evalItem}>
+                <strong>{item.label}：</strong>
+                <span>{item.text}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
 
         <div className={styles.actions}>
           <a href={`mailto:${contact.email}`} className={styles.primary}>
