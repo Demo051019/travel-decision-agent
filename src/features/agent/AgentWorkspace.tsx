@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import type { ReactNode } from 'react';
 import type {
   Message,
   ToolLampState,
@@ -78,11 +79,11 @@ function getOrCreateEoUuid(): string {
 // Module-level dedup flag — outside React lifecycle, unaffected by StrictMode
 let _historyFetchInFlight = false;
 
-export default function AgentWorkspace() {
-  return <AppInner />;
+export default function AgentWorkspace({ leading }: { leading?: ReactNode }) {
+  return <AppInner leading={leading} />;
 }
 
-function AppInner() {
+function AppInner({ leading }: { leading?: ReactNode }) {
   const { t } = useT();
   const buildLamps = useCallback((): ToolLampState[] =>
     LAMP_IDS.map(id => ({
@@ -584,6 +585,7 @@ function AppInner() {
         <div className={styles.chatPanel}>
           <header className={styles.header}>
             <div className={styles.headerLeft}>
+              {leading}
               <span className={styles.logo}>⬡</span>
               <div>
                 <p className={styles.title}>{t("app.title")}</p>

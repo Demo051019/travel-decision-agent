@@ -54,7 +54,7 @@ export const projects: Project[] = [
     ],
     accent: '#f5c842',
     links: [
-      { label: '在线试玩', href: '/agent', primary: true },
+      { label: '在线试用', href: '/agent', primary: true },
       { label: '源码', href: 'https://github.com/Demo051019/travel-decision-agent' },
     ],
     status: 'live',

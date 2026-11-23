@@ -4,24 +4,49 @@
   padding: 0;
 }
 
+/* ── Theme tokens ─────────────────────────────────────────────
+   Dark is the default. Light overrides only the tokens; components
+   never branch on the theme themselves. */
 :root {
+  color-scheme: dark;
+
   --bg-base: #0a0a0f;
   --bg-surface: #111118;
   --bg-elevated: #18181f;
   --bg-border: #2a2a38;
+  --bg-subtle: rgba(255, 255, 255, 0.015);
+  --bg-hover: rgba(255, 255, 255, 0.04);
+  --bg-strong: rgba(255, 255, 255, 0.08);
 
   --text-primary: #f0f0f8;
   --text-secondary: #8888aa;
-  --text-muted: #44445a;
+  --text-muted: #5c5c72;
 
   --accent-gold: #f5c842;
   --accent-gold-dim: #f5c84230;
   --accent-gold-glow: #f5c84260;
+  --gold-fill: #f5c842;
+  --gold-fill-hover: #ffd95c;
+  --gold-ink: #0a0a0f;
 
   --user-bubble: #1e1e2e;
   --user-border: #3a3a5a;
   --bot-bubble: #151520;
   --bot-border: #252535;
+
+  --sidebar-bg: rgba(10, 10, 16, 0.78);
+  --inset-highlight: rgba(255, 255, 255, 0.03);
+  --code-bg: rgba(0, 0, 0, 0.3);
+
+  --blob-gold: rgba(245, 200, 66, 0.09);
+  --blob-blue: rgba(90, 74, 242, 0.08);
+  --glow-gold: rgba(245, 200, 66, 0.07);
+  --glow-blue: rgba(90, 74, 242, 0.06);
+  --nav-bg: rgba(8, 8, 12, 0.72);
+
+  --cover-bg: #09090f;
+  --cover-index: rgba(255, 255, 255, 0.12);
+  --grid-line: rgba(255, 255, 255, 0.045);
 
   --font-display: 'Syne', sans-serif;
   --font-mono: 'DM Mono', monospace;
@@ -31,9 +56,53 @@
   --radius-lg: 20px;
   --radius-xl: 28px;
 
-  --shadow-card: 0 8px 40px rgba(0,0,0,0.5);
-  --transition-fast: 140ms cubic-bezier(.4,0,.2,1);
-  --transition-med: 280ms cubic-bezier(.4,0,.2,1);
+  --shadow-card: 0 8px 40px rgba(0, 0, 0, 0.5);
+  --transition-fast: 140ms cubic-bezier(.4, 0, .2, 1);
+  --transition-med: 280ms cubic-bezier(.4, 0, .2, 1);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --bg-base: #f6f4ed;
+  --bg-surface: #fffdf8;
+  --bg-elevated: #efece2;
+  --bg-border: #ddd8ca;
+  --bg-subtle: rgba(0, 0, 0, 0.025);
+  --bg-hover: rgba(0, 0, 0, 0.045);
+  --bg-strong: rgba(0, 0, 0, 0.075);
+
+  --text-primary: #191920;
+  --text-secondary: #5c5c6b;
+  --text-muted: #8a8a96;
+
+  --accent-gold: #a57400;
+  --accent-gold-dim: #a5740022;
+  --accent-gold-glow: #a5740033;
+  --gold-fill: #f5c842;
+  --gold-fill-hover: #ffd95c;
+  --gold-ink: #0a0a0f;
+
+  --user-bubble: #eeeade;
+  --user-border: #d8d2c2;
+  --bot-bubble: #fffdf8;
+  --bot-border: #e4dfd2;
+
+  --sidebar-bg: rgba(244, 241, 232, 0.85);
+  --inset-highlight: rgba(255, 255, 255, 0.7);
+  --code-bg: #f0ede3;
+
+  --blob-gold: rgba(165, 116, 0, 0.1);
+  --blob-blue: rgba(90, 74, 242, 0.07);
+  --glow-gold: rgba(165, 116, 0, 0.06);
+  --glow-blue: rgba(90, 74, 242, 0.05);
+  --nav-bg: rgba(246, 244, 237, 0.82);
+
+  --cover-bg: #ece8dc;
+  --cover-index: rgba(0, 0, 0, 0.12);
+  --grid-line: rgba(0, 0, 0, 0.06);
+
+  --shadow-card: 0 8px 40px rgba(60, 50, 20, 0.12);
 }
 
 html {
@@ -51,6 +120,7 @@ body {
   font-family: var(--font-mono);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  transition: background-color 220ms ease, color 220ms ease;
 }
 
 /* scrollbar */
@@ -59,27 +129,25 @@ body {
 ::-webkit-scrollbar-thumb { background: var(--bg-border); border-radius: 2px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-/* Language toggle */
+/* Language toggle — positioned by its container, not globally. */
 .lang-toggle {
-  position: fixed;
-  top: 14px;
-  right: 18px;
-  z-index: 1000;
   display: flex;
   align-items: center;
   gap: 2px;
   padding: 6px 14px;
   border-radius: 20px;
-  border: none;
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid transparent;
+  background: var(--bg-hover);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   cursor: pointer;
-  transition: background 0.3s ease, box-shadow 0.3s ease;
+  transition: background 0.3s ease, box-shadow 0.3s ease,
+    border-color 0.3s ease;
   line-height: 1;
 }
 .lang-toggle:hover {
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 20px rgba(245, 200, 66, 0.06);
+  background: var(--bg-strong);
+  border-color: var(--bg-border);
 }
 .lang-toggle:active {
   transform: scale(0.96);
@@ -96,7 +164,6 @@ body {
               transform 0.35s cubic-bezier(.4, 0, .2, 1),
               text-shadow 0.35s ease;
   transform: scale(0.9);
-  text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 .lang-toggle__label--active {
@@ -110,7 +177,7 @@ body {
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--text-muted);
-  opacity: 0.4;
+  opacity: 0.5;
   margin: 0 3px;
   user-select: none;
 }

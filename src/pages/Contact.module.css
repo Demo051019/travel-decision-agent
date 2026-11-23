@@ -1,0 +1,185 @@
+.page {
+  min-height: 100vh;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  transition: background-color 220ms ease, color 220ms ease;
+}
+
+.top {
+  border-bottom: 1px solid var(--bg-border);
+  background: var(--nav-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.topInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+
+.back {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.back:hover {
+  color: var(--accent-gold);
+}
+
+.main {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 88px 28px 120px;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  color: var(--accent-gold);
+}
+
+.title {
+  margin-top: 18px;
+  font-family: var(--font-display);
+  font-size: clamp(42px, 6vw, 64px);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+
+.card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 34px 48px;
+  margin-top: 44px;
+  padding: 40px;
+  border: 1px solid var(--bg-border);
+  border-radius: 20px;
+  background: var(--bg-surface);
+  transition: background-color 220ms ease, border-color 220ms ease;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.value,
+.valueLink {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  word-break: break-all;
+}
+
+.valueLink {
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 160ms ease, border-color 160ms ease;
+}
+
+.valueLink:hover {
+  color: var(--accent-gold);
+  border-color: var(--accent-gold);
+}
+
+.note {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.primary,
+.ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  text-decoration: none;
+  transition: background 160ms ease, color 160ms ease,
+    border-color 160ms ease, transform 160ms ease;
+}
+
+.primary {
+  background: var(--gold-fill);
+  color: var(--gold-ink);
+}
+
+.primary:hover {
+  background: var(--gold-fill-hover);
+  transform: translateY(-1px);
+}
+
+.ghost {
+  border: 1px solid var(--bg-border);
+  color: var(--text-primary);
+}
+
+.ghost:hover {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+
+.back:focus-visible,
+.valueLink:focus-visible,
+.primary:focus-visible,
+.ghost:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .topInner {
+    padding: 0 20px;
+  }
+
+  .main {
+    padding: 64px 20px 88px;
+  }
+
+  .card {
+    grid-template-columns: 1fr;
+    gap: 26px;
+    padding: 26px 24px;
+  }
+
+  .title {
+    font-size: clamp(36px, 12vw, 48px);
+  }
+}

@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { LangToggle, useT } from '../i18n';
+import ThemeToggle from '../components/ThemeToggle';
 import styles from './AgentPage.module.css';
 
 const AgentWorkspace = lazy(() => import('../features/agent/AgentWorkspace'));
@@ -10,7 +11,10 @@ export default function AgentPage() {
 
   return (
     <div className={styles.page}>
-      <LangToggle />
+      <div className={styles.topControls}>
+        <ThemeToggle />
+        <LangToggle />
+      </div>
 
       <Suspense
         fallback={
@@ -20,12 +24,14 @@ export default function AgentPage() {
           </div>
         }
       >
-        <AgentWorkspace />
+        <AgentWorkspace
+          leading={
+            <Link to="/" className={styles.back}>
+              {t('nav.backToPortfolio')}
+            </Link>
+          }
+        />
       </Suspense>
-
-      <Link to="/" className={styles.back}>
-        {t('nav.backToPortfolio')}
-      </Link>
     </div>
   );
 }

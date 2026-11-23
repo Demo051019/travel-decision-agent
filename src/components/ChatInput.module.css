@@ -5,7 +5,7 @@
   flex-direction: column;
   gap: 8px;
   flex-shrink: 0;
-  background: rgba(255,255,255,.015);
+  background: var(--bg-subtle);
 }
 
 /* preset chips */
@@ -87,7 +87,7 @@
   border-radius: 50%;
   border: none;
   background: var(--accent-gold);
-  color: #0a0a0f;
+  color: var(--gold-ink);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -99,7 +99,7 @@
   box-shadow: 0 0 12px var(--accent-gold-glow);
 }
 .sendBtn:hover:not(:disabled) {
-  background: #ffe066;
+  background: var(--gold-fill-hover);
   transform: scale(1.07);
   box-shadow: 0 0 20px var(--accent-gold-glow);
 }
@@ -162,7 +162,7 @@
 .clearBtn:hover:not(:disabled) {
   color: var(--text-primary);
   border-color: var(--text-muted);
-  background: rgba(255,255,255,.06);
+  background: var(--bg-strong);
   transform: scale(1.07);
 }
 .clearBtn:active:not(:disabled) { transform: scale(.95); }

@@ -10,6 +10,17 @@ export const site = {
   location: '深圳',
   cohort: '2027 届',
   github: 'https://github.com/Demo051019',
-  email: '', // 例：'you@example.com'
+  email: '13534033028@163.com',
   resume: '', // 例：'/resume.pdf'（文件放 public/ 下）
+};
+
+/** 联系方式页展示的信息。 */
+export const contact = {
+  name: '戴嘉兴',
+  availability: '可实习 6 个月以上，随时到岗',
+  phone: '13534033028',
+  wechat: '微信同号',
+  email: '13534033028@163.com',
+  location: '深圳市',
+  school: '深圳职业技术大学',
 };

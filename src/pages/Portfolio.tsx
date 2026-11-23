@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { liveProjects, hasDrafts } from '../data/projects';
 import { site } from '../data/site';
 import ProjectCard from '../components/ProjectCard';
+import ThemeToggle from '../components/ThemeToggle';
 import styles from './Portfolio.module.css';
 
 /**
@@ -35,6 +36,7 @@ export default function Portfolio() {
             <a href="#work" onClick={jumpTo('work')}>作品</a>
             <a href="#about" onClick={jumpTo('about')}>关于</a>
             <a href="#contact" onClick={jumpTo('contact')}>联系</a>
+            <ThemeToggle />
             <a
               href={site.github}
               target="_blank"
@@ -68,7 +70,7 @@ export default function Portfolio() {
                 看作品 ↓
               </a>
               <Link to="/agent" className={styles.btnGhost}>
-                试玩 Agent ↗
+                试用 Agent ↗
               </Link>
             </div>
 
@@ -131,9 +133,10 @@ export default function Portfolio() {
 
               <div className={styles.aboutText}>
                 <p>
-                  大数据技术专业，日常用 <strong>Python / SQL / Pandas</strong>{' '}
-                  做数据清洗和分析，也写 <strong>React + TypeScript</strong>{' '}
-                  做前端。最近一年主要在折腾 Agent：工具调用、SSE 流式、把每一步暴露出来。
+                  <span className={styles.school}>深圳职业技术大学 大数据技术专业</span>
+                  <br />
+                  日常用 <strong>Python / SQL / Pandas</strong> 做数据清洗和分析，也写{' '}
+                  <strong>React + TypeScript</strong> 做前端。最近三个月在折腾Agent：工具调用、SSE 流式。
                 </p>
                 <p>
                   做出行 Agent 时，路况没有简单判成「堵 / 不堵」，而是按畅通、缓行、拥堵的
@@ -166,34 +169,21 @@ export default function Portfolio() {
         <section id="contact" className={styles.sectionContact}>
           <div className={styles.container}>
             <p className={styles.eyebrow}>03 · 联系</p>
-            <h2 className={styles.contactTitle}>
-              有实习机会，
-              <br />
-              或者只是想聊聊？
-            </h2>
-            <p className={styles.contactLead}>
-              我更习惯用代码和结果说话。想看看源码，或者想要一份简历，直接找我。
-            </p>
+            <h2 className={styles.contactTitle}>如有实习机会，或者想聊聊？</h2>
+            <p className={styles.contactLead}>我喜欢用事实和成果说话</p>
 
             <div className={styles.contactActions}>
+              <Link to="/contact" className={styles.btnPrimary}>
+                添加联系方式
+              </Link>
               <a
                 href={site.github}
                 target="_blank"
                 rel="noreferrer"
-                className={styles.btnPrimary}
+                className={styles.btnGhost}
               >
                 GitHub ↗
               </a>
-              {site.email && (
-                <a href={`mailto:${site.email}`} className={styles.btnGhost}>
-                  发邮件 →
-                </a>
-              )}
-              {site.resume && (
-                <a href={site.resume} className={styles.btnGhost}>
-                  简历 PDF ↓
-                </a>
-              )}
             </div>
           </div>
         </section>

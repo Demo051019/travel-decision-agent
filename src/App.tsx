@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { I18nProvider } from './i18n';
 import Portfolio from './pages/Portfolio';
 import AgentPage from './pages/AgentPage';
+import Contact from './pages/Contact';
 
 /** Reset scroll when switching between the portfolio and the workspace. */
 function ScrollToTop() {
@@ -20,6 +21,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Portfolio />} />
         <Route path="/agent" element={<AgentPage />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </I18nProvider>
