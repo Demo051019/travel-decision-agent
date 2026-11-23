@@ -2,10 +2,12 @@ const en = {
   // Header
   "app.title": "Trip Decision Assistant",
   "app.subtitle": "Running on EdgeOne Makers — helps you pick the right mall nearby",
+  "nav.backToPortfolio": "← Portfolio",
+  "agent.loading": "Loading workspace…",
 
   // Empty state
   "empty.title": "Trip Decision Assistant",
-  "empty.hint": "Tell me where you are and which brand you're after. I'll search nearby malls, check store availability, compare distances, and give you a grounded recommendation.",
+  "empty.hint": "Tell me where you are and which brand you want. I'll check nearby malls, availability and distances.",
   "empty.features": "Amap · Brand check · Session memory",
 
   // Chat input

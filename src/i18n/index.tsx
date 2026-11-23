@@ -52,9 +52,9 @@ export function LangToggle() {
   const { lang, toggle } = useT();
   return (
     <button className="lang-toggle" onClick={toggle} title="Switch Language" aria-label="Switch Language">
-      <span className={`lang-toggle__label ${lang === "zh" ? "lang-toggle__label--active" : ""}`}>zh</span>
+      <span className={`lang-toggle__label ${lang === "zh" ? "lang-toggle__label--active" : ""}`}>中文</span>
       <span className="lang-toggle__sep">/</span>
-      <span className={`lang-toggle__label ${lang === "en" ? "lang-toggle__label--active" : ""}`}>en</span>
+      <span className={`lang-toggle__label ${lang === "en" ? "lang-toggle__label--active" : ""}`}>EN</span>
     </button>
   );
 }

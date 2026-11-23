@@ -10,14 +10,22 @@
 /* Empty state */
 .empty {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding-bottom: 40px;
+  gap: 8px;
+  padding-bottom: 12px;
+  overflow-y: auto;
+  scrollbar-width: none;
   opacity: .45;
   animation: fadeUp .5s ease both;
+}
+
+.empty::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 .emptyIcon {
   font-size: 3rem;
@@ -36,7 +44,7 @@
   font-size: .75rem;
   color: var(--text-muted);
   letter-spacing: .04em;
-  max-width: 400px;
+  max-width: 460px;
   text-align: center;
   line-height: 1.6;
 }

@@ -1,11 +1,13 @@
 import { lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
-import { LangToggle } from '../i18n';
+import { LangToggle, useT } from '../i18n';
 import styles from './AgentPage.module.css';
 
 const AgentWorkspace = lazy(() => import('../features/agent/AgentWorkspace'));
 
 export default function AgentPage() {
+  const { t } = useT();
+
   return (
     <div className={styles.page}>
       <LangToggle />
@@ -14,7 +16,7 @@ export default function AgentPage() {
         fallback={
           <div className={styles.loading}>
             <span className={styles.spinner} />
-            加载工作台…
+            {t('agent.loading')}
           </div>
         }
       >
@@ -22,7 +24,7 @@ export default function AgentPage() {
       </Suspense>
 
       <Link to="/" className={styles.back}>
-        ← 作品集
+        {t('nav.backToPortfolio')}
       </Link>
     </div>
   );

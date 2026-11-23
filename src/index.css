@@ -89,7 +89,7 @@ body {
   font-family: var(--font-mono);
   font-size: 12px;
   font-weight: 400;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   transition: font-size 0.35s cubic-bezier(.4, 0, .2, 1),
               color 0.35s cubic-bezier(.4, 0, .2, 1),
               font-weight 0.35s cubic-bezier(.4, 0, .2, 1),
