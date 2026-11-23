@@ -25,6 +25,7 @@ const zh = {
 
   // Status & errors
   "status.error": "⚠️ 请求失败，请稍后重试。",
+  "status.auth": "⚠️ 模型密钥无效（401），请检查 API Key 与接口地址是否匹配。",
   "status.quota": "⚠️ 演示额度已用完（402），模型暂时无法回答，请稍后再试。",
   "status.rateLimit": "⚠️ 请求太频繁（429），等几秒再试。",
   "status.upstream": "⚠️ 上游模型服务暂时不可用，请稍后重试。",

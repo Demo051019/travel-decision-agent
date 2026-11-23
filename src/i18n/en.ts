@@ -25,6 +25,7 @@ const en = {
 
   // Status & errors
   "status.error": "⚠️ Request failed. Please try again.",
+  "status.auth": "⚠️ Invalid model API key (401). Check that the key matches the endpoint.",
   "status.quota": "⚠️ Demo quota exhausted (402). The model is unavailable for now.",
   "status.rateLimit": "⚠️ Too many requests (429). Wait a few seconds and retry.",
   "status.upstream": "⚠️ Upstream model service is temporarily unavailable.",

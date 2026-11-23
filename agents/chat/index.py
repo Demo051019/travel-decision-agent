@@ -39,13 +39,27 @@ logger = create_logger("chat")
 
 
 # ========== LLM Model ==========
+# Prefer app-scoped LLM_* variables.
+#
+# Why: EdgeOne injects AI_GATEWAY_BASE_URL for template-created projects and
+# keeps restoring it on deploy — editing it in the console looks saved but the
+# runtime still resolves the platform value (observed 2026-11-23). Using a name
+# the platform does not manage makes BYOK endpoints actually stick.
+_LLM_BASE_URL = os.getenv("LLM_BASE_URL") or os.getenv("AI_GATEWAY_BASE_URL")
+_LLM_API_KEY = os.getenv("LLM_API_KEY") or os.getenv("AI_GATEWAY_API_KEY")
+_LLM_MODEL = (
+    os.getenv("LLM_MODEL")
+    or os.getenv("AI_GATEWAY_MODEL")
+    or "@makers/deepseek-v4-flash"
+)
+
 llm_client = AsyncOpenAI(
-    api_key=os.getenv("AI_GATEWAY_API_KEY"),
-    base_url=os.getenv("AI_GATEWAY_BASE_URL"),
+    api_key=_LLM_API_KEY,
+    base_url=_LLM_BASE_URL,
 )
 
 llm_model = OpenAIChatCompletionsModel(
-    model=os.getenv("AI_GATEWAY_MODEL", "@makers/deepseek-v4-flash"),
+    model=_LLM_MODEL,
     openai_client=llm_client,
 )
 
@@ -249,14 +263,16 @@ async def handler(context: Any) -> AsyncGenerator[str, None]:
         # changes are invisible from the outside, and a 401 caused by a stale
         # BASE_URL looks identical to a bad key.
         from urllib.parse import urlparse
-        endpoint = os.getenv("AI_GATEWAY_BASE_URL", "")
         yield sse_event("error", {
             "message": str(e),
             "errorType": type(e).__name__,
             "status": status,
             "detail": detail,
-            "endpoint": urlparse(endpoint).hostname or endpoint,
-            "model": os.getenv("AI_GATEWAY_MODEL", ""),
+            "endpoint": urlparse(_LLM_BASE_URL or "").hostname or _LLM_BASE_URL,
+            "model": _LLM_MODEL,
+            "endpointSource": (
+                "LLM_BASE_URL" if os.getenv("LLM_BASE_URL") else "AI_GATEWAY_BASE_URL"
+            ),
         })
     finally:
         yield sse_event("done", {"stopped": stopped})

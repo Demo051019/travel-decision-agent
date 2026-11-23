@@ -412,10 +412,11 @@ function AppInner() {
         // failure looks like a deployment problem.
         const status = err instanceof AgentError ? err.status : undefined;
         const key: MessageKeys =
-          status === 402 ? 'status.quota'
-            : status === 429 ? 'status.rateLimit'
-              : status && status >= 500 ? 'status.upstream'
-                : 'status.error';
+          status === 401 ? 'status.auth'
+            : status === 402 ? 'status.quota'
+              : status === 429 ? 'status.rateLimit'
+                : status && status >= 500 ? 'status.upstream'
+                  : 'status.error';
         updateBotMessage(content => content || t(key));
         finishStream();
       },
