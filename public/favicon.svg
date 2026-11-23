@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Demo">
+  <rect width="64" height="64" rx="15" fill="#f5c842" />
+  <path
+    fill="#0a0a0f"
+    fill-rule="evenodd"
+    d="M23 16h10a16 16 0 0 1 0 32H23V16Zm8 8v16h2a8 8 0 0 0 0-16h-2Z"
+  />
+</svg>

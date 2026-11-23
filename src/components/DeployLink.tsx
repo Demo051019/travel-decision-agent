@@ -7,7 +7,7 @@ import { useT } from '../i18n';
  * 某个模板"的 URL——部署由本仓库的提交触发。这个角标指向本项目的部署记录，
  * 而不是 starter 模板的新建项目页。
  */
-const PROJECT_ID = 'makers-t9sghy2qvgjc';
+const PROJECT_ID = 'makers-ulvx2n6ypniy';
 const DEPLOY_CONSOLE_URL = `https://console.cloud.tencent.com/edgeone/makers/project/${PROJECT_ID}/deployments`;
 
 /**

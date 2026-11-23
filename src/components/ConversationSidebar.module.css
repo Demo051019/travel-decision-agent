@@ -301,11 +301,18 @@
 @media (max-width: 820px) {
   .sidebar {
     flex: 0 0 168px;
-  }
-  .item {
+  }  .item {
     padding: 8px 10px;
   }
   .itemPreview {
     -webkit-line-clamp: 1;
+  }
+}
+
+/* Below 760px the sidebar leaves too little room for the chat; switch the
+   workspace to a single column. History stays available on wider screens. */
+@media (max-width: 760px) {
+  .sidebar {
+    display: none;
   }
 }
