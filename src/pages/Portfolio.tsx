@@ -2,7 +2,7 @@ import type { MouseEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { liveProjects, hasDrafts } from '../data/projects';
 import { site } from '../data/site';
-import ProjectCard from '../components/ProjectCard';
+import ProjectFlipbook from '../components/ProjectFlipbook';
 import ThemeToggle from '../components/ThemeToggle';
 import styles from './Portfolio.module.css';
 
@@ -103,11 +103,7 @@ export default function Portfolio() {
               </span>
             </div>
 
-            <div className={styles.workList}>
-              {liveProjects.map((project) => (
-                <ProjectCard key={project.slug} project={project} />
-              ))}
-            </div>
+            <ProjectFlipbook projects={liveProjects} />
 
             {hasDrafts && (
               <p className={styles.note}>

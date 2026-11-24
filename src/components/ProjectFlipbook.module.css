@@ -1,0 +1,190 @@
+.wrap {
+  position: relative;
+}
+
+.stage {
+  position: relative;
+  display: grid;
+  perspective: 2400px;
+  perspective-origin: 50% 45%;
+  --flip-shadow: rgba(0, 0, 0, 0.55);
+}
+
+:global(:root[data-theme='light']) .stage {
+  --flip-shadow: rgba(0, 0, 0, 0.16);
+}
+
+.page,
+.top {
+  grid-area: 1 / 1;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* 让短内容的卡片也撑满统一高度，翻页时不会忽高忽低 */
+.page > *,
+.top > * {
+  height: 100%;
+}
+
+.top {
+  z-index: 3;
+  will-change: transform, opacity;
+}
+
+@keyframes flipInNext {
+  from {
+    transform: rotateY(-84deg) scale(0.965);
+    opacity: 0.45;
+    filter: drop-shadow(-28px 14px 40px var(--flip-shadow));
+  }
+  55% {
+    opacity: 1;
+  }
+  to {
+    transform: rotateY(0deg) scale(1);
+    opacity: 1;
+    filter: drop-shadow(0 0 0 transparent);
+  }
+}
+
+@keyframes flipInPrev {
+  from {
+    transform: rotateY(84deg) scale(0.965);
+    opacity: 0.45;
+    filter: drop-shadow(28px 14px 40px var(--flip-shadow));
+  }
+  55% {
+    opacity: 1;
+  }
+  to {
+    transform: rotateY(0deg) scale(1);
+    opacity: 1;
+    filter: drop-shadow(0 0 0 transparent);
+  }
+}
+
+.inNext {
+  transform-origin: right center;
+  animation: flipInNext 0.52s cubic-bezier(0.33, 0.06, 0.2, 1) both;
+}
+
+.inPrev {
+  transform-origin: left center;
+  animation: flipInPrev 0.52s cubic-bezier(0.33, 0.06, 0.2, 1) both;
+}
+
+/* 左右边缘热区：只覆盖最外侧，避开卡片里的按钮 */
+.zone {
+  position: absolute;
+  top: 14px;
+  bottom: 14px;
+  width: 72px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.zone:hover {
+  opacity: 1;
+}
+
+.zoneLeft {
+  left: 0;
+  justify-content: flex-start;
+  padding-left: 6px;
+}
+
+.zoneRight {
+  right: 0;
+  justify-content: flex-end;
+  padding-right: 6px;
+}
+
+.arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--bg-border);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-size: 18px;
+  line-height: 1;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 22px;
+}
+
+.navBtn {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--bg-border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.16s, border-color 0.16s, background 0.16s;
+}
+
+.navBtn:hover {
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+  background: var(--bg-hover);
+}
+
+.counter {
+  min-width: 62px;
+  text-align: center;
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--bg-border);
+  transition: background 0.2s, transform 0.2s;
+}
+
+.dotOn {
+  background: var(--accent-gold);
+  transform: scale(1.35);
+}
+
+@media (max-width: 760px) {
+  .zone {
+    display: none;
+  }
+
+  .controls {
+    margin-top: 18px;
+  }
+}
