@@ -37,14 +37,6 @@ export default function Portfolio() {
             <a href="#about" onClick={jumpTo('about')}>关于</a>
             <a href="#contact" onClick={jumpTo('contact')}>联系</a>
             <ThemeToggle />
-            <a
-              href={site.github}
-              target="_blank"
-              rel="noreferrer"
-              className={styles.navGithub}
-            >
-              GitHub ↗
-            </a>
           </nav>
         </div>
       </header>
