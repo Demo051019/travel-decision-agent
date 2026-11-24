@@ -139,25 +139,25 @@ export default function Portfolio() {
                   做出行 Agent 时，路况没有简单判成「堵 / 不堵」，而是按畅通、缓行、拥堵的
                   <strong>里程占比</strong>计算，未知路段不计入分母。这类细节决定了答案能不能用。
                 </p>
+              </div>
+            </div>
 
-                <div className={styles.skills}>
-                  <div className={styles.skillGroup}>
-                    <h4>数据</h4>
-                    <p>Python · SQL · Pandas · 数据清洗</p>
-                  </div>
-                  <div className={styles.skillGroup}>
-                    <h4>前端</h4>
-                    <p>React · TypeScript · CSS Modules · Vite</p>
-                  </div>
-                  <div className={styles.skillGroup}>
-                    <h4>AI</h4>
-                    <p>Agents SDK · 工具调用 · SSE · Prompt</p>
-                  </div>
-                  <div className={styles.skillGroup}>
-                    <h4>工程</h4>
-                    <p>Git · EdgeOne Pages · 云函数 · 高德 API</p>
-                  </div>
-                </div>
+            <div className={styles.skills}>
+              <div className={styles.skillGroup}>
+                <h4>数据</h4>
+                <p>Python · SQL · Pandas · 数据清洗</p>
+              </div>
+              <div className={styles.skillGroup}>
+                <h4>前端</h4>
+                <p>React · TypeScript · CSS Modules · Vite</p>
+              </div>
+              <div className={styles.skillGroup}>
+                <h4>AI</h4>
+                <p>Agents SDK · 工具调用 · SSE · Prompt</p>
+              </div>
+              <div className={styles.skillGroup}>
+                <h4>工程</h4>
+                <p>Git · EdgeOne Pages · 云函数 · 高德 API</p>
               </div>
             </div>
           </div>

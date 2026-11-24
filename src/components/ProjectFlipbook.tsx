@@ -12,9 +12,12 @@ interface Incoming {
   dir: 1 | -1;
 }
 
+/** 自动轮播间隔 */
+const AUTO_MS = 5000;
+
 /**
- * 翻书式作品展示：一次一张，鼠标移到左右边缘翻页。
- * 翻页时新卡片从侧边绕轴转进来盖住旧卡片，旧卡片保持不动当底页。
+ * 作品轮播：每 5 秒自动切换到下一件，也支持点按钮手动翻。
+ * 过渡是淡入 + 轻微位移，不做 3D 翻页。
  */
 export default function ProjectFlipbook({ projects }: Props) {
   const total = projects.length;
@@ -49,12 +52,19 @@ export default function ProjectFlipbook({ projects }: Props) {
     [incoming, index, settle, total],
   );
 
+  // 每 5 秒自动前进；手动翻页会因 turn 变化而重置计时
+  useEffect(() => {
+    if (total < 2) return;
+    const id = window.setInterval(() => turn(1), AUTO_MS);
+    return () => window.clearInterval(id);
+  }, [turn, total]);
+
   if (total === 0) return null;
 
   return (
     <div className={styles.wrap}>
       <div className={styles.stage}>
-        {/* 所有卡片都保留在网格里占位，保证翻页前后高度不跳动 */}
+        {/* 所有卡片都保留在网格里占位，保证切换时高度不跳动 */}
         {projects.map((p, i) => (
           <div
             key={p.slug}
@@ -76,25 +86,6 @@ export default function ProjectFlipbook({ projects }: Props) {
           >
             <ProjectCard project={projects[incoming.index]} />
           </div>
-        )}
-
-        {total > 1 && (
-          <>
-            <div
-              className={`${styles.zone} ${styles.zoneLeft}`}
-              onMouseEnter={() => turn(-1)}
-              aria-hidden="true"
-            >
-              <span className={styles.arrow}>‹</span>
-            </div>
-            <div
-              className={`${styles.zone} ${styles.zoneRight}`}
-              onMouseEnter={() => turn(1)}
-              aria-hidden="true"
-            >
-              <span className={styles.arrow}>›</span>
-            </div>
-          </>
         )}
       </div>
 

@@ -17,7 +17,6 @@ const zh = {
   // Preset questions
   "preset.1": "我在深圳北站，附近 3 公里有哪些商场？",
   "preset.2": "我想买优衣库，附近哪家商场有？哪家最近？",
-  "preset.3": "现在去缤果空间堵不堵？打车和地铁哪个快？",
 
   // Tool indicators
   "tool.locate": "定位解析",

@@ -17,7 +17,6 @@ const en = {
   // Preset questions
   "preset.1": "I'm at Shenzhen North Station — which malls are within 3 km?",
   "preset.2": "I want to buy from Uniqlo. Which nearby mall has one, and which is closest?",
-  "preset.3": "Is traffic bad to Bingo Space right now? Taxi or metro — which is faster?",
 
   // Tool indicators
   "tool.locate": "Geocode",

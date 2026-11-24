@@ -5,23 +5,14 @@
 .stage {
   position: relative;
   display: grid;
-  perspective: 2400px;
-  perspective-origin: 50% 45%;
-  --flip-shadow: rgba(0, 0, 0, 0.55);
-}
-
-:global(:root[data-theme='light']) .stage {
-  --flip-shadow: rgba(0, 0, 0, 0.16);
 }
 
 .page,
 .top {
   grid-area: 1 / 1;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
 }
 
-/* 让短内容的卡片也撑满统一高度，翻页时不会忽高忽低 */
+/* 让短内容的卡片也撑满统一高度，切换时不会忽高忽低 */
 .page > *,
 .top > * {
   height: 100%;
@@ -30,95 +21,37 @@
 .top {
   z-index: 3;
   will-change: transform, opacity;
+  pointer-events: none;
 }
 
-@keyframes flipInNext {
+@keyframes softInNext {
   from {
-    transform: rotateY(-84deg) scale(0.965);
-    opacity: 0.45;
-    filter: drop-shadow(-28px 14px 40px var(--flip-shadow));
-  }
-  55% {
-    opacity: 1;
+    opacity: 0;
+    transform: translateX(30px) scale(0.992);
   }
   to {
-    transform: rotateY(0deg) scale(1);
     opacity: 1;
-    filter: drop-shadow(0 0 0 transparent);
+    transform: none;
   }
 }
 
-@keyframes flipInPrev {
+@keyframes softInPrev {
   from {
-    transform: rotateY(84deg) scale(0.965);
-    opacity: 0.45;
-    filter: drop-shadow(28px 14px 40px var(--flip-shadow));
-  }
-  55% {
-    opacity: 1;
+    opacity: 0;
+    transform: translateX(-30px) scale(0.992);
   }
   to {
-    transform: rotateY(0deg) scale(1);
     opacity: 1;
-    filter: drop-shadow(0 0 0 transparent);
+    transform: none;
   }
 }
 
 .inNext {
-  transform-origin: right center;
-  animation: flipInNext 0.52s cubic-bezier(0.33, 0.06, 0.2, 1) both;
+  animation: softInNext 0.55s cubic-bezier(0.22, 0.8, 0.3, 1) both;
 }
 
 .inPrev {
-  transform-origin: left center;
-  animation: flipInPrev 0.52s cubic-bezier(0.33, 0.06, 0.2, 1) both;
-}
-
-/* 左右边缘热区：只覆盖最外侧，避开卡片里的按钮 */
-.zone {
-  position: absolute;
-  top: 14px;
-  bottom: 14px;
-  width: 72px;
-  z-index: 6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.22s ease;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.zone:hover {
-  opacity: 1;
-}
-
-.zoneLeft {
-  left: 0;
-  justify-content: flex-start;
-  padding-left: 6px;
-}
-
-.zoneRight {
-  right: 0;
-  justify-content: flex-end;
-  padding-right: 6px;
-}
-
-.arrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 1px solid var(--bg-border);
-  background: var(--bg-elevated);
-  color: var(--text-secondary);
-  font-size: 18px;
-  line-height: 1;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  animation: softInPrev 0.55s cubic-bezier(0.22, 0.8, 0.3, 1) both;
 }
 
 .controls {
@@ -180,11 +113,14 @@
 }
 
 @media (max-width: 760px) {
-  .zone {
-    display: none;
-  }
-
   .controls {
     margin-top: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inNext,
+  .inPrev {
+    animation-duration: 0.01ms;
   }
 }

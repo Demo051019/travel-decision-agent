@@ -311,13 +311,32 @@
   font-weight: 500;
 }
 
+/* 技术栈：横跨整段宽度，用浅绿卡片区分四组 */
 .skills {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 22px 32px;
-  margin-top: 34px;
-  padding-top: 26px;
-  border-top: 1px solid var(--bg-border);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 46px;
+}
+
+.skillGroup {
+  --skill-accent: #5dcaa5;
+  --skill-bg: rgba(93, 202, 165, 0.07);
+  padding: 16px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--bg-border);
+  border-left: 2px solid var(--skill-accent);
+  background: var(--skill-bg);
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.skillGroup:hover {
+  border-color: var(--skill-accent);
+}
+
+:global(:root[data-theme='light']) .skillGroup {
+  --skill-accent: #1d9e75;
+  --skill-bg: rgba(29, 158, 117, 0.07);
 }
 
 .skillGroup h4 {
@@ -325,15 +344,22 @@
   font-size: 12px;
   font-weight: 400;
   letter-spacing: 0.16em;
-  color: var(--accent-gold);
+  color: var(--skill-accent);
 }
 
 .skillGroup p {
-  margin-top: 7px;
+  margin-top: 8px;
   margin-bottom: 0;
-  font-size: 14.5px;
+  font-size: 14px;
   line-height: 1.7;
   color: var(--text-secondary);
+}
+
+@media (max-width: 760px) {
+  .skills {
+    grid-template-columns: 1fr;
+    margin-top: 32px;
+  }
 }
 
 /* ── Contact ───────────────────────────────────────────────── */
