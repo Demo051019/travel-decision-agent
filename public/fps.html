@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#07080b">
+<title>帧率实验室 · 24 → 240 Hz</title>
+<style>
+  :root{
+    --bg:#07080b;
+    --line:rgba(255,255,255,.075);
+    --line-2:rgba(255,255,255,.055);
+    --txt:#e8ecf3;
+    --dim:#858d9d;
+    --dim2:#525a69;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%; text-size-adjust:100%}
+  body{
+    background:
+      radial-gradient(1100px 620px at 8% -12%, rgba(88,120,255,.11), transparent 60%),
+      radial-gradient(900px 520px at 104% -4%, rgba(168,88,255,.075), transparent 58%),
+      var(--bg);
+    color:var(--txt);
+    font-family:"Inter","SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
+    min-height:100vh;
+    min-height:100dvh;
+    overflow-x:hidden;
+    padding:0 0 96px;
+    padding-bottom:calc(96px + env(safe-area-inset-bottom));
+  }
+  body::before{
+    content:'';
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
+    background-size:64px 64px;
+    -webkit-mask-image:radial-gradient(ellipse 84% 58% at 50% -4%, #000 18%, transparent 76%);
+    mask-image:radial-gradient(ellipse 84% 58% at 50% -4%, #000 18%, transparent 76%);
+  }
+  .wrap{
+    position:relative; z-index:1;
+    max-width:1080px; margin:0 auto;
+    padding:64px 28px 0;
+  }
+
+  /* ---------- hero ---------- */
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:9px;
+    font-family:var(--mono);
+    font-size:11px; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--dim2);
+    padding:6px 12px 6px 10px;
+    border:1px solid var(--line);
+    border-radius:100px;
+    background:rgba(255,255,255,.02);
+  }
+  .eyebrow .blip{
+    width:6px;height:6px;border-radius:50%;
+    background:#5eead4;
+    box-shadow:0 0 10px 1px rgba(94,234,212,.7);
+    animation:pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.28}}
+
+  h1{
+    margin:22px 0 0;
+    font-size:clamp(40px,6.6vw,68px);
+    font-weight:700;
+    letter-spacing:-.035em;
+    line-height:1.02;
+    background:linear-gradient(178deg,#ffffff 12%,#a8b4c8 96%);
+    -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+  .lede{
+    margin-top:18px;
+    font-size:clamp(15px,1.7vw,17px);
+    line-height:1.7;
+    color:var(--dim);
+    max-width:44ch;
+  }
+  .lede em{
+    font-style:normal;
+    color:#dbe4f2;
+    border-bottom:1px solid rgba(120,160,255,.45);
+    padding-bottom:1px;
+  }
+
+  /* ---------- hud ---------- */
+  .hud{
+    display:flex; flex-wrap:wrap;
+    margin-top:34px;
+    border:1px solid var(--line);
+    border-radius:15px;
+    background:rgba(255,255,255,.018);
+    width:fit-content;
+    overflow:hidden;
+    -webkit-backdrop-filter:blur(6px);
+    backdrop-filter:blur(6px);
+  }
+  .hud-item{padding:14px 24px; border-right:1px solid var(--line-2)}
+  .hud-item:last-child{border-right:0}
+  .hud-k{
+    display:block;
+    font-family:var(--mono);
+    font-size:10px; letter-spacing:.13em; text-transform:uppercase;
+    color:var(--dim2); margin-bottom:7px;
+  }
+  .hud-v{
+    font-size:23px; font-weight:600;
+    font-variant-numeric:tabular-nums;
+    letter-spacing:-.02em;
+    line-height:1;
+  }
+  .hud-v b{font-weight:600}
+  .hud-v small{
+    font-family:var(--mono);
+    font-size:11px; font-weight:400; color:var(--dim2);
+    margin-left:3px; letter-spacing:.02em;
+  }
+  .verdict{
+    margin-top:14px;
+    font-size:13px; line-height:1.6; color:var(--dim2);
+    min-height:21px;
+    transition:color .3s;
+  }
+  .verdict b{color:#8fe3c8; font-weight:500}
+  .verdict .warn{color:#ffc978; font-weight:500}
+
+  /* ---------- section head ---------- */
+  .sec-head{
+    display:flex; align-items:flex-end; justify-content:space-between;
+    gap:20px; flex-wrap:wrap;
+    margin:64px 0 22px;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--line-2);
+  }
+  .sec-head h2{
+    font-size:19px; font-weight:600; letter-spacing:-.01em;
+  }
+  .sec-head .sec-sub{
+    font-size:12.5px; color:var(--dim2); margin-top:5px; line-height:1.5;
+  }
+
+  /* ---------- controls ---------- */
+  .controls{display:flex; align-items:center; gap:9px; flex-wrap:wrap}
+  .btn{
+    appearance:none; -webkit-appearance:none;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,.035);
+    color:var(--txt);
+    font-family:inherit; font-size:13px;
+    padding:8px 16px;
+    border-radius:9px;
+    cursor:pointer;
+    transition:background .16s, border-color .16s, transform .1s;
+    white-space:nowrap;
+  }
+  .btn:active{transform:scale(.97)}
+  .btn.primary{
+    background:rgba(120,160,255,.14);
+    border-color:rgba(120,160,255,.32);
+    color:#cfe0ff;
+    min-width:78px;
+  }
+  .btn.primary:active{background:rgba(120,160,255,.26)}
+  .seg{
+    display:flex;
+    border:1px solid var(--line);
+    border-radius:9px;
+    overflow:hidden;
+    background:rgba(255,255,255,.02);
+  }
+  .seg button{
+    appearance:none; -webkit-appearance:none;
+    border:0; border-right:1px solid var(--line-2);
+    background:transparent;
+    color:var(--dim2);
+    font-family:var(--mono); font-size:12.5px;
+    padding:8px 13px;
+    cursor:pointer;
+    transition:background .16s, color .16s;
+  }
+  .seg button:last-child{border-right:0}
+  .seg button.on{background:rgba(255,255,255,.1); color:var(--txt)}
+
+  /* 悬停只在有鼠标的设备上生效，避免触屏点击后样式粘住 */
+  @media (hover:hover) and (pointer:fine){
+    .btn:hover{background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.16)}
+    .btn.primary:hover{background:rgba(120,160,255,.22)}
+    .seg button:hover{color:var(--dim); background:rgba(255,255,255,.04)}
+  }
+
+  /* ---------- tracks ---------- */
+  .tracks{display:flex; flex-direction:column; gap:9px}
+  .track{
+    display:grid;
+    grid-template-columns:96px 1fr;
+    align-items:center;
+    gap:20px;
+    padding:9px 16px 9px 14px;
+    border-radius:13px;
+    border:1px solid var(--line-2);
+    background:linear-gradient(180deg,rgba(255,255,255,.024),rgba(255,255,255,.007));
+  }
+  .meta{
+    display:flex; flex-direction:column; gap:4px;
+    min-width:0; overflow:hidden;
+  }
+  .hzline{display:flex; align-items:baseline; gap:4px}
+  .hz{
+    font-size:23px; font-weight:600;
+    font-variant-numeric:tabular-nums;
+    letter-spacing:-.03em;
+    line-height:1;
+  }
+  .unit{
+    font-family:var(--mono);
+    font-size:10px; font-style:normal;
+    color:var(--dim2);
+    letter-spacing:.06em;
+  }
+  .tagline{
+    display:flex; align-items:center; gap:7px;
+    font-size:10.5px; color:var(--dim2);
+    white-space:nowrap;
+  }
+  .cap{
+    display:none;
+    font-family:var(--mono);
+    font-size:9px; letter-spacing:.04em;
+    color:#ffb457;
+    border:1px solid rgba(255,180,87,.24);
+    background:rgba(255,180,87,.07);
+    padding:1px 5px;
+    border-radius:4px;
+  }
+  .cap.show{display:inline-block}
+
+  .you{
+    display:none;
+    font-family:var(--mono);
+    font-size:9px; letter-spacing:.04em;
+    color:#5eead4;
+    border:1px solid rgba(94,234,212,.3);
+    background:rgba(94,234,212,.1);
+    padding:1px 5px;
+    border-radius:4px;
+    white-space:nowrap;
+  }
+  .you.show{display:inline-block}
+  .track.is-you{
+    border-color:rgba(94,234,212,.32);
+    background:linear-gradient(180deg,rgba(94,234,212,.075),rgba(94,234,212,.012));
+    box-shadow:
+      0 0 0 1px rgba(94,234,212,.1),
+      0 10px 36px -20px rgba(94,234,212,.75);
+  }
+  .track.is-you .tag{display:none}
+  .track.is-you .rail{
+    background:
+      repeating-linear-gradient(90deg, rgba(94,234,212,.09) 0 1px, transparent 1px 42px),
+      linear-gradient(180deg, rgba(94,234,212,.02), rgba(94,234,212,.05));
+  }
+
+  .rail{
+    position:relative;
+    height:42px;
+    border-radius:9px;
+    overflow:hidden;
+    background:
+      repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 1px, transparent 1px 42px),
+      linear-gradient(180deg, rgba(255,255,255,.012), rgba(255,255,255,.028));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.035), inset 0 0 0 1px rgba(255,255,255,.02);
+  }
+  .mover{
+    position:absolute;
+    top:50%; left:0;
+    width:26px; height:26px;
+    margin-top:-13px;
+    border-radius:7px;
+    background:var(--c);
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.28),
+      0 0 20px -4px var(--c),
+      0 0 46px -14px var(--c);
+    will-change:transform;
+  }
+
+  /* ---------- strips ---------- */
+  .strips{
+    display:flex; flex-direction:column; gap:11px;
+  }
+  .strip{
+    border:1px solid var(--line-2);
+    border-radius:13px;
+    background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.006));
+    overflow:hidden;
+  }
+  .strip-head{
+    display:flex; align-items:baseline; gap:10px;
+    padding:11px 16px 0;
+  }
+  .strip-head b{
+    font-family:var(--mono);
+    font-size:12.5px; font-weight:600;
+    letter-spacing:.02em;
+    color:var(--c);
+  }
+  .strip-head span{font-size:11px; color:var(--dim2)}
+  .strip-view{
+    position:relative;
+    overflow:hidden;
+    padding:6px 0 14px;
+  }
+  .strip-view::before,
+  .strip-view::after{
+    content:'';
+    position:absolute; top:0; bottom:0; width:58px;
+    pointer-events:none; z-index:2;
+  }
+  .strip-view::before{
+    left:0;
+    background:linear-gradient(90deg, #08090d 12%, rgba(8,9,13,0));
+  }
+  .strip-view::after{
+    right:0;
+    background:linear-gradient(270deg, #08090d 12%, rgba(8,9,13,0));
+  }
+  .strip-track{display:flex; will-change:transform}
+  .strip-text{
+    flex:0 0 auto;
+    white-space:nowrap;
+    font-size:30px;
+    font-weight:700;
+    letter-spacing:.005em;
+    color:rgba(232,236,243,.86);
+    padding-right:.28em;
+  }
+
+  /* ---------- notes ---------- */
+  .notes{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:13px;
+  }
+  .note{
+    padding:22px 20px 24px;
+    border:1px solid var(--line-2);
+    border-radius:14px;
+    background:linear-gradient(180deg,rgba(255,255,255,.022),rgba(255,255,255,.005));
+  }
+  .note .n{
+    display:block;
+    font-family:var(--mono);
+    font-size:10px; letter-spacing:.14em;
+    color:var(--dim2);
+    margin-bottom:14px;
+  }
+  .note h3{
+    font-size:14.5px; font-weight:600;
+    letter-spacing:-.005em;
+    line-height:1.45;
+    margin-bottom:9px;
+    color:#e4e9f2;
+  }
+  .note p{
+    font-size:12.6px; line-height:1.78;
+    color:var(--dim);
+  }
+  .note p b{color:#c9d5e8; font-weight:500}
+  .kbd{
+    font-family:var(--mono);
+    font-size:11px;
+    padding:1px 5px;
+    border-radius:4px;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,.05);
+    color:#c9d5e8;
+  }
+
+  footer{
+    margin-top:56px;
+    padding-top:22px;
+    border-top:1px solid var(--line-2);
+    display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;
+    font-size:11.5px;
+    color:var(--dim2);
+    line-height:1.7;
+  }
+  footer .sig{font-family:var(--mono); letter-spacing:.06em}
+
+  @media (max-width:780px){
+    .wrap{padding:44px 18px 0}
+    .notes{grid-template-columns:1fr}
+    .track{grid-template-columns:62px 1fr; gap:12px; padding:8px 12px 8px 10px}
+    .hz{font-size:18px}
+    .rail{height:36px}
+    .mover{width:22px;height:22px;margin-top:-11px;border-radius:6px}
+    .strip-text{font-size:24px}
+    .hud{width:100%}
+    .hud-item{flex:1; padding:12px 12px}
+    .hud-v{font-size:18px}
+    .sec-head{margin-top:46px}
+    /* 窄屏放不下“影院/电竞”这类描述，只留状态标签 */
+    .tagline .tag{display:none}
+    .cap,.you{font-size:9px;padding:1px 4px}
+    /* 手机上不需要键盘提示 */
+    .sig{display:none}
+    /* 控制条改成两行：暂停独占一行，速度四档等分 */
+    .controls{width:100%; gap:8px}
+    .btn.primary{flex:1 1 100%; padding:11px 0; min-width:0}
+    .seg{
+      display:flex;
+      width:100%;
+      flex:1 1 100%;
+    }
+    .seg button{
+      flex:1 1 0;
+      min-width:0;
+      padding:10px 0;
+      font-size:12px;
+    }
+  }
+
+  @media (max-width:400px){
+    .wrap{padding:36px 14px 0}
+    .hz{font-size:16px}
+    .hzline{gap:3px}
+    .unit{font-size:9px}
+    .track{grid-template-columns:54px 1fr}
+    .hud-item{padding:11px 9px}
+    .hud-k{font-size:9px;letter-spacing:.06em}
+    .hud-v{font-size:16px}
+    .hud-v small{font-size:9px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow"><span class="blip"></span>FRAME RATE LAB · 24 → 240 HZ</div>
+    <h1>帧率实验室</h1>
+    <p class="lede">同一条轨道，同一个速度。唯一的变量是<em>每秒更新几次</em>。往下看，找找你的眼睛在哪一刻放弃抵抗。</p>
+
+    <div class="hud">
+      <div class="hud-item">
+        <span class="hud-k">你的屏幕</span>
+        <span class="hud-v"><b id="hzVal">--</b><small>Hz</small></span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-k">实时帧率</span>
+        <span class="hud-v"><b id="fpsVal">--</b><small>fps</small></span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-k">帧时间</span>
+        <span class="hud-v"><b id="ftVal">--</b><small>ms</small></span>
+      </div>
+    </div>
+    <p class="verdict" id="verdict">正在测量你的显示器……</p>
+  </header>
+
+  <div class="sec-head">
+    <div>
+      <h2>八档帧率，一条时间轴</h2>
+      <p class="sec-sub">所有方块速度完全一致 —— 差别只在于每秒被「画」了多少次</p>
+    </div>
+    <div class="controls">
+      <button class="btn primary" id="playBtn">暂停</button>
+      <div class="seg" id="speedSeg">
+        <button data-speed="0.25">0.25×</button>
+        <button data-speed="0.5">0.5×</button>
+        <button data-speed="1" class="on">1×</button>
+        <button data-speed="2">2×</button>
+      </div>
+    </div>
+  </div>
+
+  <section class="tracks" id="tracks"></section>
+
+  <div class="sec-head">
+    <div>
+      <h2>同一句话，三种采样率</h2>
+      <p class="sec-sub">滚动速度一模一样，24Hz 那行会一冲一冲地推着走</p>
+    </div>
+  </div>
+
+  <section class="strips">
+    <div class="strip" data-hz="24" style="--c:#ff6b4a">
+      <div class="strip-head"><b>24 Hz</b><span>每秒 24 次采样 · 电影的标准</span></div>
+      <div class="strip-view"><div class="strip-track"><span class="strip-text"></span><span class="strip-text"></span></div></div>
+    </div>
+    <div class="strip" data-hz="60" style="--c:#ffd93d">
+      <div class="strip-head"><b>60 Hz</b><span>每秒 60 次采样 · 大多数显示器的默认值</span></div>
+      <div class="strip-view"><div class="strip-track"><span class="strip-text"></span><span class="strip-text"></span></div></div>
+    </div>
+    <div class="strip" data-hz="240" style="--c:#a78bfa">
+      <div class="strip-head"><b>240 Hz</b><span>每秒 240 次采样 · 天花板</span></div>
+      <div class="strip-view"><div class="strip-track"><span class="strip-text"></span><span class="strip-text"></span></div></div>
+    </div>
+  </section>
+
+  <div class="sec-head">
+    <div><h2>三件值得知道的事</h2></div>
+  </div>
+
+  <section class="notes">
+    <div class="note">
+      <span class="n">01</span>
+      <h3>24Hz 不是「慢」，是「稀」</h3>
+      <p>它每秒只提供 <b>24 个位置</b>。物体在两点之间是怎么走的，全是你的大脑补出来的。补得顺叫电影感，补不上就叫卡。</p>
+    </div>
+    <div class="note">
+      <span class="n">02</span>
+      <h3>你的屏幕才是天花板</h3>
+      <p>如果上面的数字是 <b id="noteHz">60</b>，那 120/144/165/240 这几条轨道看起来会和 60 一模一样 —— <b>这不是 bug</b>，是硬件每秒只能给你这么多张不同的画面。</p>
+    </div>
+    <div class="note">
+      <span class="n">03</span>
+      <h3>速度越快，帧率越贵</h3>
+      <p>慢悠悠地晃，24 和 240 差别不大；一旦快速横移，低帧率就原形毕露。高帧率的真正价值在<b>快速运动</b>和<b>鼠标跟手</b>。</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>在 60Hz 屏幕上，你永远看不到真正的 240 帧。这个页面也骗不过你的显示器。</span>
+    <span class="sig">按 <span class="kbd">空格</span> 暂停 · <span class="kbd">←</span> <span class="kbd">→</span> 调速</span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var RATES = [
+    {hz:24,  tag:'影院',   c:'#ff6b4a'},
+    {hz:30,  tag:'旧动画', c:'#ffa34a'},
+    {hz:60,  tag:'经典屏', c:'#ffd93d'},
+    {hz:90,  tag:'手游',   c:'#b6e64a'},
+    {hz:120, tag:'高刷',   c:'#4ade80'},
+    {hz:144, tag:'电竞',   c:'#22d3ee'},
+    {hz:165, tag:'快屏',   c:'#60a5fa'},
+    {hz:240, tag:'天花板', c:'#a78bfa'}
+  ];
+
+  var PERIOD = 2600;        // 往返一个来回的毫秒数
+  var STRIP_SPEED = 300;    // 滚动文字 px/s
+  var SPEEDS = [0.25, 0.5, 1, 2];
+
+  var playing = true;
+  var speed = 1;
+  var clock = 0;
+  var prev = performance.now();
+  var screenHz = 60;
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var tracks = [];
+  var strips = [];
+
+  var hzVal    = document.getElementById('hzVal');
+  var fpsVal   = document.getElementById('fpsVal');
+  var ftVal    = document.getElementById('ftVal');
+  var verdict  = document.getElementById('verdict');
+  var noteHz   = document.getElementById('noteHz');
+  var tracksEl = document.getElementById('tracks');
+  var playBtn  = document.getElementById('playBtn');
+
+  /* ---------------- 构建轨道 ---------------- */
+  RATES.forEach(function(r, i){
+    var row = document.createElement('div');
+    row.className = 'track';
+    row.innerHTML =
+      '<div class="meta">' +
+        '<div class="hzline"><b class="hz" style="color:' + r.c + '">' + r.hz + '</b><i class="unit">Hz</i></div>' +
+        '<div class="tagline">' +
+          '<span class="tag">' + r.tag + '</span>' +
+          '<span class="cap">超出屏幕</span>' +
+          '<span class="you">你的屏幕</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="rail"><div class="mover" style="--c:' + r.c + '"></div></div>';
+    tracksEl.appendChild(row);
+
+    tracks.push({
+      hz: r.hz,
+      row:   row,
+      rail:  row.querySelector('.rail'),
+      mover: row.querySelector('.mover'),
+      cap:   row.querySelector('.cap'),
+      you:   row.querySelector('.you'),
+      acc:   1000 / r.hz,
+      span:  0,
+      lastX: NaN
+    });
+  });
+
+  function measureSpans(){
+    tracks.forEach(function(t){
+      t.span = Math.max(t.rail.clientWidth - t.mover.offsetWidth, 0);
+    });
+  }
+  measureSpans();
+  window.addEventListener('resize', measureSpans);
+
+  /* ---------------- 构建滚动条 ---------------- */
+  var BASE = '流畅不是快，是不跳 · SMOOTH IS NOT FAST · 0123456789 · ';
+  var CONTENT = BASE.repeat(12);
+
+  Array.prototype.forEach.call(document.querySelectorAll('.strip'), function(el){
+    var hz = parseFloat(el.dataset.hz);
+    var track = el.querySelector('.strip-track');
+    var spans = track.querySelectorAll('.strip-text');
+    for (var i = 0; i < spans.length; i++) spans[i].textContent = CONTENT;
+
+    strips.push({
+      hz: hz,
+      track: track,
+      half: spans[0].offsetWidth || 1,
+      acc: 1000 / hz,
+      raw: 0,
+      lastX: NaN
+    });
+  });
+
+  function remeasureStrips(){
+    strips.forEach(function(s){
+      s.half = s.track.children[0].offsetWidth || 1;
+    });
+  }
+  window.addEventListener('resize', remeasureStrips);
+
+  /* ---------------- 三角波 ---------------- */
+  function tri(t){
+    var x = ((t % PERIOD) + PERIOD) % PERIOD / PERIOD;
+    return x < 0.5 ? x * 2 : 2 - x * 2;
+  }
+
+  /* ---------------- 主循环 ---------------- */
+  var frameCount = 0;
+  var fpsStamp = performance.now();
+
+  function tick(now){
+    var raw = now - prev;
+    prev = now;
+    var dt = Math.min(Math.max(raw, 0), 64);
+
+    if (playing) clock += dt * speed;
+
+    // 实时帧率
+    frameCount++;
+    var el = now - fpsStamp;
+    if (el >= 480) {
+      fpsVal.textContent = Math.round(frameCount * 1000 / el);
+      ftVal.textContent = (el / frameCount).toFixed(1);
+      frameCount = 0;
+      fpsStamp = now;
+    }
+
+    var p = tri(clock);
+
+    for (var i = 0; i < tracks.length; i++) {
+      var t = tracks[i];
+      if (playing) t.acc += dt * speed;
+      var interval = 1000 / t.hz;
+
+      // 留 0.6ms 容差，避免刷新率与目标帧率接近时因浮点误差周期性跳帧
+      if (t.acc >= interval - 0.6) {
+        t.acc = t.acc % interval;
+        var x = Math.round(p * t.span);
+        if (x !== t.lastX) {
+          t.mover.style.transform = 'translate3d(' + x + 'px,0,0)';
+          t.lastX = x;
+        }
+      }
+    }
+
+    for (var j = 0; j < strips.length; j++) {
+      var s = strips[j];
+      // 位移每帧累积（保证速度一致），只有写入 DOM 的时机被帧率节流
+      if (playing) {
+        s.raw = (s.raw + dt * speed * STRIP_SPEED / 1000) % s.half;
+        s.acc += dt * speed;
+      }
+      var si = 1000 / s.hz;
+
+      if (s.acc >= si - 0.6) {
+        s.acc = s.acc % si;
+        var sx = -Math.round(s.raw);
+        if (sx !== s.lastX) {
+          s.track.style.transform = 'translate3d(' + sx + 'px,0,0)';
+          s.lastX = sx;
+        }
+      }
+    }
+
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  /* ---------------- 测量刷新率 ---------------- */
+  function measureRefresh(cb){
+    var stamps = [];
+    function step(now){
+      stamps.push(now);
+      if (stamps.length < 40) { requestAnimationFrame(step); return; }
+      var d = [];
+      for (var i = 1; i < stamps.length; i++) d.push(stamps[i] - stamps[i - 1]);
+      d.sort(function(a, b){ return a - b; });
+      cb(1000 / d[d.length >> 1]);
+    }
+    requestAnimationFrame(step);
+  }
+
+  var gotReal = false;
+
+  function applyHz(hz, failed){
+    if (failed && gotReal) return;   // 已有真实测量结果，忽略兜底
+    if (!failed) gotReal = true;
+
+    var COMMON = [24, 30, 48, 50, 60, 75, 90, 100, 120, 144, 165, 180, 240, 360];
+    var snapped = Math.round(hz);
+    for (var i = 0; i < COMMON.length; i++) {
+      if (Math.abs(COMMON[i] - hz) < 1.5) { snapped = COMMON[i]; break; }
+    }
+    screenHz = snapped;
+
+    hzVal.textContent = snapped;
+    noteHz.textContent = snapped;
+
+    var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    // iOS 上测到 60 很可能是 Safari 的渲染上限，而不是屏幕上限
+    var iosCapped = isIOS && snapped <= 60;
+
+    // 高亮你屏幕对应的那一档；其余超出能力的打标
+    var mine = null;
+    tracks.forEach(function(t){
+      if (Math.abs(t.hz - snapped) < 0.5) {
+        mine = t;
+        t.row.classList.add('is-you');
+        if (iosCapped) t.you.textContent = '渲染上限';
+        t.you.classList.add('show');
+      } else if (t.hz > snapped * 1.08) {
+        t.cap.classList.add('show');
+      }
+    });
+
+    measureSpans();
+
+    var mineTxt = mine
+      ? '下面<b>青色高亮</b>的就是你这一档。'
+      : '你的刷新率不在列表档位里，最接近 ' + snapped + 'Hz。';
+
+    if (failed) {
+      verdict.innerHTML = '没能测准刷新率（页面可能刚打开或在后台），先按 <b>' + snapped + 'Hz</b> 估算。把窗口切到前台刷新一次会更准。';
+      return;
+    }
+
+    // iOS：这里测到的是 Safari 给网页的渲染帧率，不等于屏幕刷新率上限
+    if (isIOS) {
+      if (snapped >= 100) {
+        verdict.innerHTML = '这台设备给网页的渲染频率是 <b>' + snapped + 'Hz</b>，' + mineTxt +
+          '再往上的档位会被标成「超出屏幕」—— iPhone / iPad 屏幕最高 120Hz，144、165、240 在移动端永远看不到。';
+      } else {
+        verdict.innerHTML = '测到 <b>' + snapped + 'Hz</b>。注意：iPhone 的屏幕可能比这更快，' +
+          '但 Safari 默认把网页渲染锁在 60fps。想看 120Hz 得去 设置 → App → Safari → 进阶 → 功能旗标，' +
+          '关掉「Prefer Page Rendering Updates near 60fps」，再重启 Safari。往下滚，24Hz 的卡顿在手机上一样明显。';
+      }
+      return;
+    }
+
+    if (snapped >= 200) {
+      verdict.innerHTML = '你的屏幕有 <b>' + snapped + 'Hz</b>，' + mineTxt + '下面每一档都是真在跑 —— 慢速段看不出差别，盯着 240 那条的掉头瞬间看。';
+    } else if (snapped >= 130) {
+      verdict.innerHTML = '你的屏幕有 <b>' + snapped + 'Hz</b>，' + mineTxt + '120 / 144 / 165 之间能看出细腻度差异，更高的档位会被硬件截断。';
+    } else if (snapped >= 85) {
+      verdict.innerHTML = '你的屏幕约 <b>' + snapped + 'Hz</b>，' + mineTxt + '60 和 90 之间有肉眼可见的差距，再往上就被截断了。';
+    } else {
+      verdict.innerHTML = '你的屏幕约 <b>' + snapped + 'Hz</b>，' + mineTxt + '超过 ' + snapped + 'Hz 的轨道会被标成「超出屏幕」，它们看起来和 ' + snapped + ' 一样 —— 这正是物理限制。';
+    }
+  }
+
+  measureRefresh(function(hz){ applyHz(hz, false); });
+  setTimeout(function(){ if (!gotReal) applyHz(60, true); }, 4000);
+
+  /* ---------------- 控制 ---------------- */
+  function setPlaying(v){
+    playing = v;
+    playBtn.textContent = v ? '暂停' : '继续';
+  }
+
+  playBtn.addEventListener('click', function(){ setPlaying(!playing); });
+
+  var seg = document.getElementById('speedSeg');
+  seg.addEventListener('click', function(e){
+    var b = e.target.closest('button');
+    if (!b) return;
+    speed = parseFloat(b.dataset.speed);
+    Array.prototype.forEach.call(seg.children, function(c){ c.classList.toggle('on', c === b); });
+    if (!playing) setPlaying(true);
+  });
+
+  window.addEventListener('keydown', function(e){
+    if (e.code === 'Space') {
+      e.preventDefault();
+      setPlaying(!playing);
+    } else if (e.code === 'ArrowRight') {
+      e.preventDefault();
+      var idx = SPEEDS.indexOf(speed);
+      var next = SPEEDS[Math.min(idx + 1, SPEEDS.length - 1)];
+      seg.querySelector('[data-speed="' + next + '"]').click();
+    } else if (e.code === 'ArrowLeft') {
+      e.preventDefault();
+      var idx2 = SPEEDS.indexOf(speed);
+      var pv = SPEEDS[Math.max(idx2 - 1, 0)];
+      seg.querySelector('[data-speed="' + pv + '"]').click();
+    }
+  });
+
+  if (reduced) setPlaying(false);
+
+  document.addEventListener('visibilitychange', function(){
+    if (!document.hidden) {
+      prev = performance.now();
+      fpsStamp = performance.now();
+      frameCount = 0;
+    }
+  });
+})();
+</script>
+</body>
+</html>
