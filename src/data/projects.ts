@@ -11,6 +11,8 @@ export interface ProjectLink {
   label: string;
   href: string;
   primary?: boolean;
+  /** 站内但非 SPA 路由（例如 public/ 下的独立 HTML），用 <a> 同窗口跳转 */
+  external?: boolean;
 }
 
 export interface ProjectMetric {
@@ -60,8 +62,28 @@ export const projects: Project[] = [
     status: 'live',
   },
   {
-    slug: 'course-project-a',
+    slug: 'frame-rate-lab',
     index: '02',
+    title: '帧率实验室',
+    kicker: 'WEB · RENDERING',
+    subtitle: '24Hz 到 240Hz，同一条轨道上的采样差异。',
+    summary:
+      '八条轨道共用一套运动学公式，但每档按自己的目标帧率独立节流写 DOM —— 所以 24Hz 的跳跃是真实采样造成的，不是把动画调慢。附带屏幕刷新率探测和 iOS 渲染上限提示。',
+    role: '前端 · 可视化',
+    year: '2026',
+    stack: ['HTML', 'CSS', 'Vanilla JS', 'requestAnimationFrame'],
+    metrics: [
+      { value: '8 档', label: '采样率对比' },
+      { value: '240Hz', label: '最高档位' },
+      { value: '双主题', label: '深色 / 浅色' },
+    ],
+    accent: '#22d3ee',
+    links: [{ label: '打开实验', href: '/fps.html', primary: true, external: true }],
+    status: 'live',
+  },
+  {
+    slug: 'course-project-a',
+    index: '03',
     title: '课程项目 A',
     kicker: 'DATA · DRAFT',
     subtitle: '待替换：一句话说清它解决什么问题。',
@@ -81,7 +103,7 @@ export const projects: Project[] = [
   },
   {
     slug: 'course-project-b',
-    index: '03',
+    index: '04',
     title: '课程项目 B',
     kicker: 'DATA · DRAFT',
     subtitle: '待替换：一句话说清它解决什么问题。',

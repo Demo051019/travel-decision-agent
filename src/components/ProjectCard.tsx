@@ -54,27 +54,32 @@ export default function ProjectCard({ project }: Props) {
 
         {project.links.length > 0 && (
           <div className={styles.links}>
-            {project.links.map((link) =>
-              link.href.startsWith('/') ? (
-                <Link
-                  key={link.href}
-                  to={link.href}
-                  className={link.primary ? styles.primary : styles.link}
-                >
-                  {link.label} →
-                </Link>
-              ) : (
+            {project.links.map((link) => {
+              const cls = link.primary ? styles.primary : styles.link;
+
+              // 站内 SPA 路由
+              if (link.href.startsWith('/') && !link.external) {
+                return (
+                  <Link key={link.href} to={link.href} className={cls}>
+                    {link.label} →
+                  </Link>
+                );
+              }
+
+              // 站内独立 HTML 保持同窗口；站外链接开新标签
+              const sameTab = Boolean(link.external);
+              return (
                 <a
                   key={link.href}
                   href={link.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={link.primary ? styles.primary : styles.link}
+                  target={sameTab ? undefined : '_blank'}
+                  rel={sameTab ? undefined : 'noreferrer'}
+                  className={cls}
                 >
-                  {link.label} ↗
+                  {link.label} {sameTab ? '→' : '↗'}
                 </a>
-              )
-            )}
+              );
+            })}
           </div>
         )}
       </div>
