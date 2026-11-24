@@ -2,7 +2,7 @@ const zh = {
   // Header
   "app.title": "出行决策助手",
   "app.subtitle": "运行在 EdgeOne Makers 上，帮你比出附近最合适的商场",
-  "nav.backToPortfolio": "← 主页",
+  "nav.backToPortfolio": "← 作品集",
   "agent.loading": "加载工作台…",
 
   // Empty state

@@ -2,7 +2,7 @@ const en = {
   // Header
   "app.title": "Trip Decision Assistant",
   "app.subtitle": "Running on EdgeOne Makers — helps you pick the right mall nearby",
-  "nav.backToPortfolio": "← Home",
+  "nav.backToPortfolio": "← Portfolio",
   "agent.loading": "Loading workspace…",
 
   // Empty state

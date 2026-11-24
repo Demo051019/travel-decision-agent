@@ -45,23 +45,31 @@
 }
 
 /* Rendered as the first item of the workspace header. */
+/* 约定：所有子页面的返回入口固定在左上角，文案统一「← 作品集」 */
 .back {
+  position: fixed;
+  top: calc(14px + env(safe-area-inset-top));
+  left: calc(14px + env(safe-area-inset-left));
+  z-index: 1001;
   display: inline-flex;
   align-items: center;
-  margin-right: 2px;
-  padding-right: 14px;
-  border-right: 1px solid var(--bg-border);
+  height: 38px;
+  padding: 0 14px 0 12px;
+  border: 1px solid var(--bg-border);
+  border-radius: 10px;
+  background: var(--bg-surface);
   font-family: var(--font-mono);
-  font-size: 15px;
+  font-size: 12.5px;
   letter-spacing: 0.02em;
   color: var(--text-secondary);
   text-decoration: none;
   white-space: nowrap;
-  transition: color 160ms ease;
+  transition: color 160ms ease, border-color 160ms ease;
 }
 
 .back:hover {
   color: var(--accent-gold);
+  border-color: var(--accent-gold);
 }
 
 .back:focus-visible {
@@ -69,10 +77,14 @@
   outline-offset: 3px;
 }
 
-@media (max-width: 560px) {
+@media (max-width: 760px) {
+  /* 窄屏侧栏隐藏，按钮回到标题栏内，仍在左上角 */
   .back {
-    padding-right: 10px;
-    margin-right: 0;
+    position: static;
+    height: auto;
+    padding: 0;
+    border: 0;
+    background: none;
     font-size: 14px;
   }
 

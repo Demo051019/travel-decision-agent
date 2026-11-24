@@ -11,6 +11,11 @@ export default function AgentPage() {
 
   return (
     <div className={styles.page}>
+      {/* 放在 .stage 之外：stage 有入场动画的 transform，会让 fixed 后代相对它定位 */}
+      <Link to="/" className={styles.back}>
+        {t('nav.backToPortfolio')}
+      </Link>
+
       <div className={styles.topControls}>
         <ThemeToggle />
         <LangToggle />
@@ -24,13 +29,7 @@ export default function AgentPage() {
           </div>
         }
       >
-        <AgentWorkspace
-          leading={
-            <Link to="/" className={styles.back}>
-              {t('nav.backToPortfolio')}
-            </Link>
-          }
-        />
+        <AgentWorkspace />
       </Suspense>
     </div>
   );

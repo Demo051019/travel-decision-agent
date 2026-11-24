@@ -7,6 +7,8 @@
   justify-content: center;
   overflow: hidden;
   background: var(--bg-base);
+  /* 给左上角固定的「← 作品集」让出 52px */
+  padding-top: 52px;
 }
 
 /* ambient blobs */
